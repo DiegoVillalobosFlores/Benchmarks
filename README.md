@@ -1,4 +1,5 @@
-# bun-react-template
+# Benchmarks
+Simple util to store and share logging information from MSI Afterburner or MangoHud
 
 To install dependencies:
 
