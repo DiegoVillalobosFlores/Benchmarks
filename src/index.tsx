@@ -10,26 +10,44 @@ await Bun.build({
   outdir: "dist",
 });
 
+const faviconFile = Bun.file("./src/entrypoints/favicon.svg");
+await Bun.write("./dist/favicon.svg", faviconFile);
+
 const assetMap: AppAssetMap = {
   globalStyles: "globalStyles.css",
   hydrationScript: "hydrationScript.js",
   favicon: "favicon.svg",
 };
 
-const assetMapStaticFiles = Object.values(assetMap).reduce(
-  (acc, assetName) => ({
+const contentTypeMap = {
+  css: "text/css",
+  js: "application/javascript",
+  svg: "image/svg+xml",
+};
+
+const assetMapStaticFiles = Object.values(assetMap).reduce((acc, assetName) => {
+  const assetExtension = assetName.split(".").pop() as
+    | keyof typeof contentTypeMap
+    | undefined;
+
+  if (!assetExtension) {
+    throw new Error(`Invalid asset name: ${assetName}`);
+  }
+
+  if (!contentTypeMap[assetExtension]) {
+    throw new Error(`Unsupported asset type: ${assetExtension}`);
+  }
+
+  return {
     ...acc,
     [`/${assetName}`]: async () =>
       new Response(await Bun.file(`dist/${assetName}`).bytes(), {
         headers: {
-          "Content-Type": assetName.endsWith(".css")
-            ? "text/css"
-            : "application/javascript",
+          "Content-Type": contentTypeMap[assetExtension],
         },
       }),
-  }),
-  {},
-);
+  };
+}, {});
 
 const server = serve({
   routes: {
