@@ -13,16 +13,21 @@ await Bun.build({
 const faviconFile = Bun.file("./src/entrypoints/favicon.svg");
 await Bun.write("./dist/favicon.svg", faviconFile);
 
+const fontFile = Bun.file("./src/entrypoints/font.ttf");
+await Bun.write("./dist/font.ttf", fontFile);
+
 const assetMap: AppAssetMap = {
   globalStyles: "globalStyles.css",
   hydrationScript: "hydrationScript.js",
   favicon: "favicon.svg",
+  font: "font.ttf",
 };
 
 const contentTypeMap = {
   css: "text/css",
   js: "application/javascript",
   svg: "image/svg+xml",
+  ttf: "font/ttf",
 };
 
 const assetMapStaticFiles = Object.values(assetMap).reduce((acc, assetName) => {

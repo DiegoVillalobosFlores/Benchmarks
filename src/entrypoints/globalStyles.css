@@ -1,4 +1,17 @@
+@font-face {
+    font-family: "Quicksand";
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url("./font.ttf") format("woff2");
+}
+
 body {
     background-color: black;
     color: white;
+    font-family: "Quicksand", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
 }

@@ -5,7 +5,8 @@ const entrypoints = readdirSync("./src/entrypoints", { withFileTypes: true })
     (entry) =>
       !entry.isDirectory() &&
       entry.name !== "index.ts" &&
-      entry.name !== "favicon.svg",
+      entry.name !== "favicon.svg" &&
+      entry.name !== "font.ttf",
   )
   .reverse()
   .map((entry) => {
