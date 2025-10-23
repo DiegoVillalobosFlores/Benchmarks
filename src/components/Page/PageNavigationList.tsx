@@ -12,6 +12,7 @@ export default function PageNavigationList({ title, children }: Props) {
         display: "flex",
         flexDirection: "column",
         gap: "8px",
+        flexWrap: "wrap",
       }}
     >
       <h3>{title}</h3>
@@ -19,6 +20,7 @@ export default function PageNavigationList({ title, children }: Props) {
         style={{
           display: "flex",
           gap: "8px",
+          flexWrap: "wrap",
         }}
       >
         {children}
