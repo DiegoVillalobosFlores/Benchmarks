@@ -1,9 +1,12 @@
 import { serve } from "bun";
-import { renderToReadableStream } from "react-dom/server";
-import App from "./app/index";
-import AppAssetMap from "./types/AppAssetMap";
-import entrypoints from "./entrypoints";
+import { renderToReadableStream, renderToString } from "react-dom/server";
+import App from "./routes/app/index";
+import entrypoints, { assetMap, assetMapStaticFiles } from "./entrypoints";
 import clientProps from "./clientProps";
+import benchmarksRoutes from "./routes/api/benchmarks";
+import BenchmarksServiceInstance from "./core/services/benchmarks";
+import SQLiteClient from "./core/clients/sql/sqlite";
+import BenchmarkSection from "./components/BenchmarkSection/BenchmarkSection";
 
 await Bun.build({
   entrypoints,
@@ -16,56 +19,36 @@ await Bun.write("./dist/favicon.svg", faviconFile);
 const fontFile = Bun.file("./src/entrypoints/font.ttf");
 await Bun.write("./dist/font.ttf", fontFile);
 
-const assetMap: AppAssetMap = {
-  globalStyles: "globalStyles.css",
-  hydrationScript: "hydrationScript.js",
-  favicon: "favicon.svg",
-  font: "font.ttf",
-};
+const SQLClientInstance = await SQLiteClient();
 
-const contentTypeMap = {
-  css: "text/css",
-  js: "application/javascript",
-  svg: "image/svg+xml",
-  ttf: "font/ttf",
-};
-
-const assetMapStaticFiles = Object.values(assetMap).reduce((acc, assetName) => {
-  const assetExtension = assetName.split(".").pop() as
-    | keyof typeof contentTypeMap
-    | undefined;
-
-  if (!assetExtension) {
-    throw new Error(`Invalid asset name: ${assetName}`);
-  }
-
-  if (!contentTypeMap[assetExtension]) {
-    throw new Error(`Unsupported asset type: ${assetExtension}`);
-  }
-
-  return {
-    ...acc,
-    [`/${assetName}`]: async () =>
-      new Response(await Bun.file(`dist/${assetName}`).bytes(), {
-        headers: {
-          "Content-Type": contentTypeMap[assetExtension],
-        },
-      }),
-  };
-}, {});
+const benchmarksServiceInstance = await BenchmarksServiceInstance({
+  sqlClient: SQLClientInstance,
+});
 
 const server = serve({
   routes: {
     "/": async () => {
-      const stream = await renderToReadableStream(<App assetMap={assetMap} />, {
-        bootstrapScriptContent: clientProps({ assetMap }),
-        bootstrapModules: ["hydrationScript.js"],
-      });
+      const benchmarks = await SQLClientInstance`
+        select b.id, g.name, b.created_at from Benchmark b join main.Game G on G.id = b.game_id;
+      `;
+
+      const stream = await renderToReadableStream(
+        <App assetMap={assetMap}>
+          <BenchmarkSection benchmarks={benchmarks} />
+        </App>,
+        {
+          bootstrapScriptContent: clientProps({ assetMap, benchmarks }),
+          bootstrapModules: ["hydrationScript.js"],
+        },
+      );
 
       return new Response(stream, {
         headers: { "Content-Type": "text/html" },
       });
     },
+    ...benchmarksRoutes({
+      benchmarksServiceInstance,
+    }),
     ...assetMapStaticFiles,
   },
 
@@ -78,7 +61,7 @@ const server = serve({
 
   development: process.env.NODE_ENV !== "production" && {
     // Enable browser hot reloading in development
-    hmr: true,
+    hmr: false,
 
     // Echo console logs from the browser to the server
     console: true,
