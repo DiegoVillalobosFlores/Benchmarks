@@ -3,7 +3,7 @@ node_modules
 
 # output
 dist
-benchmarks
+/benchmarks
 
 # code coverage
 coverage
