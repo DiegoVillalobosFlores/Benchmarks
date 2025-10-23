@@ -1,35 +1,22 @@
 import { useEffect, useState } from "react";
 
-export default function useKeyboardNavigation(
-  initialIndex: number | null,
-  maxRange: number,
-) {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(
-    initialIndex,
-  );
+type Props = Record<string, () => void>;
 
+export default function useKeyboardNavigation(controls: Props) {
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
-      if (event.key === "ArrowUp") {
-        setSelectedIndex((index) =>
-          index !== null ? (index === 0 ? maxRange : index - 1) : maxRange,
-        );
-      }
+      const control = controls[event.key];
 
-      if (event.key === "ArrowDown") {
-        setSelectedIndex((index) =>
-          index !== null ? (index === maxRange ? 0 : index + 1) : 0,
-        );
+      if (control) {
+        event.preventDefault();
+        control();
       }
     };
+
     window.addEventListener("keydown", listener);
+
     return () => {
       window.removeEventListener("keydown", listener);
     };
-  }, [maxRange]);
-
-  return {
-    selectedIndex,
-    setSelectedIndex,
-  };
+  }, []);
 }
