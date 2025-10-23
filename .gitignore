@@ -28,3 +28,9 @@ coverage
 
 # Finder (MacOS) folder config
 .DS_Store
+
+# SQLite
+benchmarks.db
+benchmarks.db-journal
+benchmarks.db-wal
+benchmarks.db-shm
