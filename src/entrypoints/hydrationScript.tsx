@@ -1,4 +1,11 @@
 import { hydrateRoot } from "react-dom/client";
-import App from "../app/index";
+import App from "../routes/app/index";
+import BenchmarkSection from "@/components/BenchmarkSection/BenchmarkSection";
 
-hydrateRoot(document, <App assetMap={window.assetMap} />);
+//TODO: find a way to add routing
+hydrateRoot(
+  document,
+  <App assetMap={window.assetMap}>
+    <BenchmarkSection benchmarks={window.benchmarks} />
+  </App>,
+);
