@@ -1,10 +1,15 @@
 import AppAssetMap from "@/types/AppAssetMap";
+import { ReactNode } from "react";
+import PageBody from "./PageBody";
 
 type Props = {
   assetMap: AppAssetMap;
+  children: ReactNode;
+  title: string;
+  header: ReactNode;
 };
 
-export default function App({ assetMap }: Props) {
+export default function Page({ assetMap, children, title, header }: Props) {
   return (
     <html>
       <head>
@@ -12,11 +17,14 @@ export default function App({ assetMap }: Props) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/svg+xml" href={assetMap.favicon} />
         <link rel="stylesheet" href={assetMap.globalStyles} />
-        <title>Benchmarks</title>
+        <title>{title}</title>
       </head>
-      <body>
-        <h1>Welcome to Benchmarks</h1>
-      </body>
+      <PageBody>
+        <header>{header}</header>
+        <br />
+        <br />
+        <main>{children}</main>
+      </PageBody>
     </html>
   );
 }
