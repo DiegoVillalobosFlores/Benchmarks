@@ -21,8 +21,6 @@ export default function Page({ assetMap, children, title, header }: Props) {
       </head>
       <PageBody>
         <header>{header}</header>
-        <br />
-        <br />
         <main>{children}</main>
       </PageBody>
     </html>

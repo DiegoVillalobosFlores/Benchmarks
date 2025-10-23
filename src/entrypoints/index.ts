@@ -17,7 +17,6 @@ const entrypoints = readdirSync("./src/entrypoints", { withFileTypes: true })
 export const assetMap: AppAssetMap = {
   globalStyles: "globalStyles.css",
   hydrationScript: "hydrationScript.js",
-  hydrationScriptCSS: "hydrationScript.css",
   favicon: "favicon.svg",
   font: "font.ttf",
 };

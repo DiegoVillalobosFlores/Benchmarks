@@ -59,8 +59,6 @@ export default function BenchmarkList({ benchmarks }: Props) {
     };
   }, [selectedBenchmarkIndex]);
 
-  console.log("selectedBenchmarkIndex", selectedBenchmarkIndex);
-
   return (
     <div
       style={{

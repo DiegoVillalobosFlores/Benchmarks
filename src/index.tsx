@@ -1,12 +1,9 @@
 import { serve } from "bun";
-import { renderToReadableStream, renderToString } from "react-dom/server";
-import App from "./routes/app/index";
-import entrypoints, { assetMap, assetMapStaticFiles } from "./entrypoints";
-import clientProps from "./clientProps";
+import entrypoints, { assetMapStaticFiles } from "./entrypoints";
 import benchmarksRoutes from "./routes/api/benchmarks";
 import BenchmarksServiceInstance from "./core/services/benchmarks";
 import SQLiteClient from "./core/clients/sql/sqlite";
-import BenchmarkSection from "./components/BenchmarkSection/BenchmarkSection";
+import applicationPagesRoutes from "./routes/app/index";
 
 await Bun.build({
   entrypoints,
@@ -27,25 +24,7 @@ const benchmarksServiceInstance = await BenchmarksServiceInstance({
 
 const server = serve({
   routes: {
-    "/": async () => {
-      const benchmarks = await SQLClientInstance`
-        select b.id, g.name, b.created_at from Benchmark b join main.Game G on G.id = b.game_id;
-      `;
-
-      const stream = await renderToReadableStream(
-        <App assetMap={assetMap}>
-          <BenchmarkSection benchmarks={benchmarks} />
-        </App>,
-        {
-          bootstrapScriptContent: clientProps({ assetMap, benchmarks }),
-          bootstrapModules: ["hydrationScript.js"],
-        },
-      );
-
-      return new Response(stream, {
-        headers: { "Content-Type": "text/html" },
-      });
-    },
+    ...applicationPagesRoutes(SQLClientInstance),
     ...benchmarksRoutes({
       benchmarksServiceInstance,
     }),

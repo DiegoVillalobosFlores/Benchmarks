@@ -1,20 +1,31 @@
-import Page from "@/components/Page/Page";
-import AppAssetMap from "@/types/AppAssetMap";
-import { ReactNode } from "react";
+import { SQL } from "bun";
+import { renderToReadableStream } from "react-dom/server";
+import App from "./root";
+import { assetMap } from "@/entrypoints";
+import generateClientProps from "@/utils/generateClientProps";
 
-type Props = {
-  assetMap: AppAssetMap;
-  children: ReactNode;
+const pagesRouter = {
+  root: "/",
 };
 
-export default function App({ assetMap, children }: Props) {
-  return (
-    <Page
-      assetMap={assetMap}
-      title="Benchmarks"
-      header={<h1>Welcome to Benchmarks</h1>}
-    >
-      {children}
-    </Page>
-  );
+export default function applicationPagesRoutes(SQLClientInstance: SQL) {
+  return {
+    [pagesRouter.root]: async () => {
+      const benchmarks = await SQLClientInstance`
+        select b.id, g.name, b.created_at from Benchmark b join main.Game G on G.id = b.game_id;
+      `;
+
+      const stream = await renderToReadableStream(
+        <App assetMap={assetMap} benchmarks={benchmarks} />,
+        {
+          bootstrapScriptContent: generateClientProps({ assetMap, benchmarks }),
+          bootstrapModules: ["hydrationScript.js"],
+        },
+      );
+
+      return new Response(stream, {
+        headers: { "Content-Type": "text/html" },
+      });
+    },
+  };
 }
