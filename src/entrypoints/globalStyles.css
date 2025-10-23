@@ -33,3 +33,7 @@ main {
 section {
     display: contents;
 }
+
+ul {
+    list-style-type: none;
+}
