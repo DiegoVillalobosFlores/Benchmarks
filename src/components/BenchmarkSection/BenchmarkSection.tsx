@@ -1,13 +1,13 @@
 import { ComponentProps } from "react";
 import BenchmarkList from "../BenchmarkList/BenchmarkList";
-import FileUpload from "../FileUpload/FileUpload";
+import PageSection from "../Page/PageSection";
 
 type Props = ComponentProps<typeof BenchmarkList>;
 
 export default function BenchmarkSection({ benchmarks }: Props) {
   return (
-    <section>
+    <PageSection>
       <BenchmarkList benchmarks={benchmarks} />
-    </section>
+    </PageSection>
   );
 }
