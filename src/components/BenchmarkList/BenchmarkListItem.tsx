@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 type Benchmark = {
   id: string;
   name: string;
@@ -37,8 +39,16 @@ export default function BenchmarkListItem({
   isSelected,
   onFocus,
 }: Props) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  if (isSelected) {
+    ref.current?.focus();
+    ref.current?.scrollIntoView({ behavior: "auto", block: "center" });
+  }
+
   return (
     <div
+      ref={ref}
       key={benchmark.id}
       style={isSelected ? styles.root.focused : styles.root.default}
       onFocus={onFocus}

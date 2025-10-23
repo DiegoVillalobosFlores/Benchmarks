@@ -7,9 +7,16 @@ type Props = {
   children: ReactNode;
   title: string;
   header: ReactNode;
+  navigation: ReactNode;
 };
 
-export default function Page({ assetMap, children, title, header }: Props) {
+export default function Page({
+  assetMap,
+  children,
+  title,
+  header,
+  navigation,
+}: Props) {
   return (
     <html>
       <head>
@@ -21,6 +28,7 @@ export default function Page({ assetMap, children, title, header }: Props) {
       </head>
       <PageBody>
         <header>{header}</header>
+        {navigation}
         <main>{children}</main>
       </PageBody>
     </html>

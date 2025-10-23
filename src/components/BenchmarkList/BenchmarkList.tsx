@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
 import BenchmarkListItem from "./BenchmarkListItem";
-import useKeyboardNavigation from "@/utils/useKeyboardNavigation";
 
 type Benchmark = {
   id: string;
@@ -10,20 +8,21 @@ type Benchmark = {
 
 type Props = {
   benchmarks: Array<Benchmark>;
+  selectedBenchmarkIndex: number | null;
+  onBenchmarkFocus: (index: number) => void;
 };
 
-export default function BenchmarkList({ benchmarks }: Props) {
-  const { selectedIndex, setSelectedIndex } = useKeyboardNavigation(
-    null,
-    benchmarks.length - 1,
-  );
-
+export default function BenchmarkList({
+  benchmarks,
+  selectedBenchmarkIndex,
+  onBenchmarkFocus,
+}: Props) {
   return (
     <div>
       {benchmarks.map((benchmark, index) => (
         <BenchmarkListItem
-          onFocus={() => setSelectedIndex(index)}
-          isSelected={selectedIndex === index}
+          onFocus={() => onBenchmarkFocus(index)}
+          isSelected={selectedBenchmarkIndex === index}
           key={benchmark.id}
           benchmark={benchmark}
         />

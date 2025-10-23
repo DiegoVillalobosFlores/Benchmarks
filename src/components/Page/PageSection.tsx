@@ -13,6 +13,7 @@ export default function PageSection({
         padding: "32px",
         height: "100%",
         gap: "8px",
+        overflowY: "scroll",
       }}
     >
       {children}
