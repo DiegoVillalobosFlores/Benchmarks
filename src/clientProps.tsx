@@ -1,9 +1,11 @@
 import AppAssetMap from "./types/AppAssetMap";
 
-type Props = {
-  assetMap: AppAssetMap;
-};
+type Props = Record<string, unknown>;
 
-export default function clientProps({ assetMap }: Props) {
-  return `window.assetMap = ${JSON.stringify(assetMap)};`;
+export default function clientProps(props: Props) {
+  const serializedProps = Object.entries(props)
+    .map(([key, value]) => `window.${key} = ${JSON.stringify(value)}`)
+    .join(";");
+
+  return serializedProps;
 }
