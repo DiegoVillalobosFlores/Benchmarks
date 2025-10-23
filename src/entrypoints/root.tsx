@@ -1,11 +1,11 @@
 import { hydrateRoot } from "react-dom/client";
 import { StrictMode } from "react";
-import App from "@/routes/app/root";
+import BenchmarksPage from "@/components/BenchmarksPage/BenchmarksPage";
 
 //TODO: find a way to add routing
 hydrateRoot(
   document,
   <StrictMode>
-    <App {...window.clientProps} />
+    <BenchmarksPage {...window.clientProps} />
   </StrictMode>,
 );
