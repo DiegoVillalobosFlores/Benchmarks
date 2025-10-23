@@ -1,3 +1,4 @@
+import { pagesRouter } from "@/routes/app";
 import AppAssetMap from "@/types/AppAssetMap";
 import { readdirSync } from "fs";
 
@@ -16,9 +17,15 @@ const entrypoints = readdirSync("./src/entrypoints", { withFileTypes: true })
 
 export const assetMap: AppAssetMap = {
   globalStyles: "globalStyles.css",
-  hydrationScript: "hydrationScript.js",
   favicon: "favicon.svg",
   font: "font.ttf",
+  ...Object.entries(pagesRouter).reduce(
+    (acc, [key, value]) => {
+      acc[key] = value.hydrationScript;
+      return acc;
+    },
+    {} as Record<string, string>,
+  ),
 };
 
 const contentTypeMap = {
