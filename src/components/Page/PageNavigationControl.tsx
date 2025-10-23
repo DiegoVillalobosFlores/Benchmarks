@@ -1,0 +1,49 @@
+import { ReactNode } from "react";
+
+type Props = {
+  onFocus: () => void;
+  isFocused: boolean;
+  isActive: boolean;
+  children: ReactNode;
+};
+
+const styles = {
+  root: {
+    default: {
+      display: "flex",
+      gap: "8px",
+      alignItems: "center",
+      border: "2px solid transparent",
+      borderRadius: "8px",
+      cursor: "pointer",
+      transition: "all 0.2s ease-in-out",
+    },
+    focused: {
+      border: "2px solid gray",
+      paddingLeft: "8px",
+      paddingRight: "8px",
+    },
+    active: {
+      textDecoration: "underline",
+    },
+  },
+};
+
+export default function PageNavigationControl({
+  children,
+  isFocused,
+  isActive,
+  onFocus,
+}: Props) {
+  const style = {
+    ...styles.root.default,
+    ...(isFocused ? styles.root.focused : {}),
+    ...(isActive ? styles.root.active : {}),
+  };
+
+  return (
+    <li style={style} onFocus={onFocus} onMouseEnter={onFocus}>
+      {children}
+    </li>
+  );
+}
