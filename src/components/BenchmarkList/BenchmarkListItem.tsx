@@ -23,9 +23,11 @@ const styles = {
       cursor: "pointer",
     },
     focused: {
+      paddingLeft: "16px",
       border: "2px solid lightseagreen",
     },
     hovered: {
+      paddingLeft: "16px",
       border: "2px solid lightseagreen",
     },
   },

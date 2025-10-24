@@ -28,23 +28,23 @@ export default function UploadPage({ assetMap }: Props) {
   }, [focusedControl, clearControls]);
 
   useKeyboardNavigation({
-    ArrowUp: () => {
-      // setFocusedControl("moveUp");
-      setClearControls(true);
-    },
-    ArrowDown: () => {
-      // setFocusedControl("moveDown");
-      setClearControls(true);
-    },
+    // ArrowUp: () => {
+    //   // setFocusedControl("moveUp");
+    //   setClearControls(true);
+    // },
+    // ArrowDown: () => {
+    //   // setFocusedControl("moveDown");
+    //   setClearControls(true);
+    // },
     ArrowLeft: () => {
       setFocusedControl("moveBack");
       setClearControls(true);
       window.history.back();
     },
-    Enter: () => {
-      setFocusedControl("go");
-      setClearControls(true);
-    },
+    // Enter: () => {
+    //   setFocusedControl("go");
+    //   setClearControls(true);
+    // },
     1: () => {
       setFocusedControl("categories");
       setClearControls(true);
@@ -68,6 +68,18 @@ export default function UploadPage({ assetMap }: Props) {
       header={<h1>Upload a new benchmark</h1>}
       navigation={
         <UploadPageNavigation
+          onClick={(control) => {
+            if (control === "upload") {
+              setActiveControl("upload");
+            }
+            if (control === "categories") {
+              setActiveControl("categories");
+            }
+            if (control === "benchmarks") {
+              setActiveControl("benchmarks");
+              window.location.assign("/");
+            }
+          }}
           activeControl={activeControl}
           focusedControl={focusedControl}
           onFocus={(control) => {

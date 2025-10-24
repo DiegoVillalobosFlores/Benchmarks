@@ -9,12 +9,14 @@ type Props = {
   activeControl: Control | null;
   focusedControl: Control | null;
   onFocus: (control: Control) => void;
+  onClick: (control: Control) => void;
 };
 
 export default function UploadPageNavigation({
   activeControl,
   focusedControl,
   onFocus,
+  onClick,
 }: Props) {
   return (
     <PageNavigation>
@@ -23,6 +25,7 @@ export default function UploadPageNavigation({
           isActive={activeControl === "categories"}
           isFocused={focusedControl === "categories"}
           onFocus={() => onFocus("categories")}
+          onClick={() => onClick("categories")}
         >
           <h3>1. Categories</h3>
         </PageNavigationControl>
@@ -30,6 +33,7 @@ export default function UploadPageNavigation({
           isActive={activeControl === "benchmarks"}
           isFocused={focusedControl === "benchmarks"}
           onFocus={() => onFocus("benchmarks")}
+          onClick={() => onClick("benchmarks")}
         >
           <h3>2. Benchmarks</h3>
         </PageNavigationControl>
@@ -37,6 +41,7 @@ export default function UploadPageNavigation({
           isActive={activeControl === "upload"}
           isFocused={focusedControl === "upload"}
           onFocus={() => onFocus("upload")}
+          onClick={() => onClick("upload")}
         >
           <h3>3. Upload</h3>
         </PageNavigationControl>
@@ -46,6 +51,7 @@ export default function UploadPageNavigation({
           isActive={activeControl === "moveBack"}
           isFocused={focusedControl === "moveBack"}
           onFocus={() => onFocus("moveBack")}
+          onClick={() => onClick("moveBack")}
         >
           <MoveLeft size={16} />
           <h3>Move Back</h3>

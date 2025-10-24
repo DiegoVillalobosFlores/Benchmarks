@@ -18,11 +18,11 @@ const styles = {
       borderRadius: "8px",
       cursor: "pointer",
       transition: "all 0.2s ease-in-out",
+      paddingLeft: "8px",
+      paddingRight: "8px",
     },
     focused: {
       border: "2px solid gray",
-      paddingLeft: "8px",
-      paddingRight: "8px",
     },
     active: {
       textDecoration: "underline",

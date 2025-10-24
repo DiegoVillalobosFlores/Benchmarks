@@ -74,7 +74,7 @@ export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
       setActiveControl("upload");
       setFocusedControl("upload");
       setClearControls(false);
-      window.location.href = "/upload";
+      window.location.assign("/upload");
     },
   });
 
@@ -88,7 +88,6 @@ export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
           activeControl={activeControl}
           focusedControl={focusedControl}
           onClick={(control) => {
-            console.log(control);
             setClearControls(false);
 
             if (control === "upload") {
@@ -105,7 +104,6 @@ export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
             if (control === "benchmarks") {
               setActiveControl("benchmarks");
               setFocusedControl("benchmarks");
-              window.location.href = "/";
             }
           }}
           onFocus={(control) => {
