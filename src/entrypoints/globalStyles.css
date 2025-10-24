@@ -4,7 +4,7 @@
     font-weight: 200;
     font-style: normal;
     font-display: swap;
-    src: url("./font.ttf") format("woff2");
+    src: url("./font.woff2") format("woff2");
 }
 
 * {
@@ -14,16 +14,6 @@
     font-family: "Quicksand", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-    height: 100dvh;
-    background-color: black;
-    color: white;
-    padding: 32px;
-    gap: 16px;
 }
 
 main {
