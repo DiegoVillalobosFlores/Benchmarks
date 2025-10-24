@@ -1,5 +1,7 @@
 import BenchmarkList from "@/components/BenchmarkList/BenchmarkList";
-import BenchmarksPageNavigation from "@/components/BenchmarksPage/BenchmarksPageNavigation";
+import BenchmarksPageNavigation, {
+  Control,
+} from "@/components/BenchmarksPage/BenchmarksPageNavigation";
 import Page from "@/components/Page/Page";
 import PageSection from "@/components/Page/PageSection";
 import AppAssetMap from "@/types/AppAssetMap";
@@ -10,8 +12,6 @@ type Props = {
   assetMap: AppAssetMap;
   benchmarks: ComponentProps<typeof BenchmarkList>["benchmarks"];
 };
-
-type Control = ComponentProps<typeof BenchmarksPageNavigation>["activeControl"];
 
 export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
   const [selectedBenchmarkIndex, setSelectedBenchmarkIndex] = useState<
@@ -71,8 +71,10 @@ export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
       setClearControls(true);
     },
     3: () => {
+      setActiveControl("upload");
       setFocusedControl("upload");
-      setClearControls(true);
+      setClearControls(false);
+      window.location.href = "/upload";
     },
   });
 
@@ -85,6 +87,27 @@ export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
         <BenchmarksPageNavigation
           activeControl={activeControl}
           focusedControl={focusedControl}
+          onClick={(control) => {
+            console.log(control);
+            setClearControls(false);
+
+            if (control === "upload") {
+              setActiveControl("upload");
+              setFocusedControl("upload");
+              window.location.href = "/upload";
+            }
+
+            if (control === "categories") {
+              setActiveControl("categories");
+              setFocusedControl("categories");
+            }
+
+            if (control === "benchmarks") {
+              setActiveControl("benchmarks");
+              setFocusedControl("benchmarks");
+              window.location.href = "/";
+            }
+          }}
           onFocus={(control) => {
             setFocusedControl(control);
             setClearControls(false);

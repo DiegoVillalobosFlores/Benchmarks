@@ -1,7 +1,11 @@
-import { benchmarkRoutePaths } from "@/routes/api/benchmarks";
-import { useState, ChangeEvent } from "react";
+import { benchmarksAPIRouter } from "@/routes/api/benchmarks";
+import { useState, ChangeEvent, useRef } from "react";
 
-export default function FileUpload() {
+type Props = {
+  onUploadSuccess: () => void;
+};
+
+export default function FileUpload({ onUploadSuccess }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
@@ -13,7 +17,7 @@ export default function FileUpload() {
       const formData = new FormData();
       formData.append("benchmark", file);
 
-      const response = await fetch(benchmarkRoutePaths.create, {
+      const response = await fetch(benchmarksAPIRouter.create, {
         method: "POST",
         body: formData,
       });
@@ -27,17 +31,20 @@ export default function FileUpload() {
 
       setUploadStatus(`Upload successful: ${JSON.stringify(data)}`);
 
-      location.reload();
+      onUploadSuccess();
     }
   };
 
   return (
-    <div>
-      <label>
-        Upload Benchmark:
-        <input type="file" onChange={handleFileChange} />
-      </label>
-      {uploadStatus && <p>{uploadStatus}</p>}
-    </div>
+    <label>
+      <h3>Upload Benchmark</h3>
+      <input
+        type="file"
+        onChange={handleFileChange}
+        style={{
+          visibility: "hidden",
+        }}
+      />
+    </label>
   );
 }
