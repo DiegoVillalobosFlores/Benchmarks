@@ -6,41 +6,52 @@ import SQLiteClient from "./core/clients/sql/sqlite";
 import applicationPagesRoutes from "./routes/app/index";
 import { watch } from "fs";
 import readCache from "./utils/readCache";
+import { rm } from "node:fs/promises";
 
-const gzipCompressionOptions = {
-  level: 9,
-  memLevel: 9,
-  windowBits: 31,
-} as const;
+await rm("dist", { recursive: true, force: true });
+await rm("cache", { recursive: true, force: true });
 
-try {
-  for (const entrypoint of entrypoints) {
-    const result = await Bun.build({
-      entrypoints: [entrypoint],
-      outdir: "dist",
-      minify: true,
-      sourcemap: "linked",
-    });
-    const file = Bun.file(result.outputs[0]?.path);
-    await file.write(
-      Bun.gzipSync(await file.arrayBuffer(), gzipCompressionOptions),
-    );
+const bundledEntrypoints = Object.values<string[]>(entrypoints);
+
+const scripts: {
+  root: string[];
+  upload: string[];
+} = {
+  root: [],
+  upload: [],
+};
+
+for (const extensionBundle of bundledEntrypoints) {
+  const result = await Bun.build({
+    entrypoints: extensionBundle,
+    minify: true,
+    outdir: "dist",
+    sourcemap: "linked",
+    splitting: true,
+    packages: "bundle",
+    target: "browser",
+  });
+
+  const chunks = result.outputs.filter((output) => output.kind === "chunk");
+
+  for (const scriptExtension of extensionBundle) {
+    if (!scriptExtension.endsWith(".tsx")) continue;
+    const scriptName = scriptExtension.split("/").pop() as string;
+    const scriptNameWithoutExtension = scriptName.split(".")[0];
+
+    if (!scriptNameWithoutExtension) continue;
+    if (
+      !scriptNameWithoutExtension.startsWith("root") &&
+      !scriptNameWithoutExtension.startsWith("upload")
+    )
+      continue;
+
+    scripts[scriptNameWithoutExtension as keyof typeof scripts] = [
+      `${scriptNameWithoutExtension}.js`,
+      ...chunks.map((chunk) => chunk.path.split("/").pop() as string),
+    ];
   }
-} catch (error) {
-  console.log(error);
 }
-
-const faviconFile = Bun.file("./src/entrypoints/favicon.svg");
-await Bun.write(
-  "./dist/favicon.svg",
-  Bun.gzipSync(await faviconFile.arrayBuffer(), gzipCompressionOptions),
-);
-
-const fontFile = Bun.file("./src/entrypoints/font.woff2");
-await Bun.write(
-  "./dist/font.woff2",
-  Bun.gzipSync(await fontFile.arrayBuffer(), gzipCompressionOptions),
-);
 
 const SQLClientInstance = await SQLiteClient();
 
@@ -52,7 +63,7 @@ const cache = await readCache();
 
 const server = serve({
   routes: {
-    ...(await applicationPagesRoutes(SQLClientInstance, cache)),
+    ...(await applicationPagesRoutes({ SQLClientInstance, cache, scripts })),
     ...benchmarksRoutes({
       benchmarksServiceInstance,
       cache,
@@ -79,7 +90,7 @@ const watcher = watch("./cache", async (event, filename) => {
 
   server.reload({
     routes: {
-      ...(await applicationPagesRoutes(SQLClientInstance, cache)),
+      ...(await applicationPagesRoutes({ SQLClientInstance, cache, scripts })),
       ...benchmarksRoutes({
         benchmarksServiceInstance,
         cache,

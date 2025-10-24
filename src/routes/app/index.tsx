@@ -9,7 +9,7 @@ import RoutesCache from "@/types/RoutesCache";
 
 type Page = {
   url: string;
-  hydrationScript: string;
+  hydrationScripts: string[];
 };
 
 type Router = {
@@ -20,18 +20,26 @@ type Router = {
 export const pagesRouter: Router = {
   root: {
     url: "/",
-    hydrationScript: "root.js",
+    hydrationScripts: ["root.js", "chunk-fxed1csc.js"],
   },
   upload: {
     url: "/upload",
-    hydrationScript: "upload.js",
+    hydrationScripts: ["upload.js", "chunk-fxed1csc.js"],
   },
 } as const;
 
-export default async function applicationPagesRoutes(
-  SQLClientInstance: SQL,
-  cache: RoutesCache,
-) {
+export default async function applicationPagesRoutes({
+  SQLClientInstance,
+  cache,
+  scripts,
+}: {
+  SQLClientInstance: SQL;
+  cache: RoutesCache;
+  scripts: {
+    root: string[];
+    upload: string[];
+  };
+}) {
   return {
     [pagesRouter.root.url]: cache.root.hit
       ? new Response(await cache.root.file.bytes(), {
@@ -55,7 +63,7 @@ export default async function applicationPagesRoutes(
                 assetMap,
                 benchmarks,
               }),
-              bootstrapModules: [pagesRouter.root.hydrationScript],
+              bootstrapModules: scripts.root,
             },
           );
 
@@ -90,7 +98,7 @@ export default async function applicationPagesRoutes(
             </StrictMode>,
             {
               bootstrapScriptContent: generateClientProps({ assetMap }),
-              bootstrapModules: [pagesRouter.upload.hydrationScript],
+              bootstrapModules: scripts.upload,
             },
           );
 

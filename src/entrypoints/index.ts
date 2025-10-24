@@ -2,32 +2,6 @@ import { pagesRouter } from "@/routes/app";
 import AppAssetMap from "@/types/AppAssetMap";
 import { readdirSync } from "fs";
 
-const entrypoints = readdirSync("./src/entrypoints", { withFileTypes: true })
-  .filter(
-    (entry) =>
-      !entry.isDirectory() &&
-      entry.name !== "index.ts" &&
-      entry.name !== "favicon.svg" &&
-      entry.name !== "font.woff2",
-  )
-  .reverse()
-  .map((entry) => {
-    return `${entry.parentPath}/${entry.name}`;
-  });
-
-export const assetMap: AppAssetMap = {
-  globalStyles: "globalStyles.css",
-  favicon: "favicon.svg",
-  font: "font.woff2",
-  ...Object.entries(pagesRouter).reduce(
-    (acc, [key, value]) => {
-      acc[key] = value.hydrationScript;
-      return acc;
-    },
-    {} as Record<string, string>,
-  ),
-};
-
 const contentTypeMap = {
   css: "text/css",
   js: "application/javascript",
@@ -36,36 +10,71 @@ const contentTypeMap = {
   woff2: "font/woff2",
 };
 
-export const assetMapStaticFiles = async () => {
-  const staticFiles = await Promise.all(
-    Object.values<string>(assetMap).map(async (assetName) => {
-      const assetExtension = assetName.split(".").pop() as
+const entrypoints = readdirSync("./src/entrypoints", { withFileTypes: true })
+  .filter((entry) => !entry.isDirectory() && entry.name !== "index.ts")
+  .reduce(
+    (acc, entry) => {
+      const extension = entry.name.split(".").pop() as
         | keyof typeof contentTypeMap
         | undefined;
-
-      if (!assetExtension) {
-        throw new Error(`Invalid asset name: ${assetName}`);
-      }
-
-      if (!contentTypeMap[assetExtension]) {
-        throw new Error(`Unsupported asset type: ${assetExtension}`);
+      if (!extension) {
+        throw new Error(`Invalid asset name: ${entry.name}`);
       }
 
       return {
-        [`/${assetName}`]: new Response(
-          await Bun.file(`dist/${assetName}`).bytes(),
-          {
-            headers: {
-              "Content-Type": contentTypeMap[assetExtension],
-              "Content-Encoding": "gzip",
-            },
-          },
-        ),
+        ...acc,
+        [extension]: [
+          ...(acc[extension] || []),
+          `${entry.parentPath}/${entry.name}`,
+        ],
       };
-    }),
+    },
+    {} as Record<string, string[]>,
   );
 
-  return Object.assign({}, ...staticFiles);
+export const assetMap: AppAssetMap = {
+  globalStyles: "globalStyles.css",
+  favicon: "favicon.svg",
+  font: "font.woff2",
+};
+
+export const assetMapStaticFiles = async () => {
+  const staticFiles = readdirSync("./dist", { withFileTypes: true }).filter(
+    (entry) => entry.isFile(),
+  );
+
+  const router: Record<string, Response> = {};
+
+  const enableCompression = true;
+
+  for (const entry of staticFiles) {
+    const readFile = await Bun.file(`dist/${entry.name}`).bytes();
+
+    const response = enableCompression
+      ? Bun.gzipSync(readFile, {
+          level: 9,
+          memLevel: 9,
+          windowBits: 31,
+        })
+      : readFile;
+
+    const headers: HeadersInit = {
+      "Content-Type":
+        contentTypeMap[
+          entry.name.split(".").pop() as keyof typeof contentTypeMap
+        ],
+    };
+
+    if (enableCompression) {
+      headers["Content-Encoding"] = "gzip";
+    }
+
+    router[`/${entry.name}`] = new Response(response, {
+      headers,
+    });
+  }
+
+  return router;
 };
 
 export default entrypoints;
