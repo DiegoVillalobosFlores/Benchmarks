@@ -26,7 +26,7 @@ const assets: AppAssetMap = {
   favicon: "",
   globalStyles: "",
   font: "",
-};
+} as const;
 
 for (const extensionBundle of bundledEntrypoints) {
   const result = await Bun.build({
@@ -74,11 +74,7 @@ for (const extensionBundle of bundledEntrypoints) {
     assets[assetNameWithoutExtension as keyof typeof assets] =
       buildAssets[0]?.path.split("/").pop();
   }
-
-  // console.log(result);
 }
-
-console.log(assets);
 
 const SQLClientInstance = await SQLiteClient();
 
