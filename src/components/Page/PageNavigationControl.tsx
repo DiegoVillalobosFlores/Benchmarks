@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 
 type Props = {
   onFocus: () => void;
+  onClick: () => void;
   isFocused: boolean;
   isActive: boolean;
   children: ReactNode;
@@ -34,6 +35,7 @@ export default function PageNavigationControl({
   isFocused,
   isActive,
   onFocus,
+  onClick,
 }: Props) {
   const style = {
     ...styles.root.default,
@@ -42,7 +44,15 @@ export default function PageNavigationControl({
   };
 
   return (
-    <li style={style} onFocus={onFocus} onMouseEnter={onFocus}>
+    <li
+      style={style}
+      onFocus={onFocus}
+      onClick={() => {
+        console.log("Clicked");
+        onClick();
+      }}
+      onMouseEnter={onFocus}
+    >
       {children}
     </li>
   );
