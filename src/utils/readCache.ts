@@ -1,6 +1,8 @@
 import RoutesCache from "@/types/RoutesCache";
 
 export default async function readCache(): Promise<RoutesCache> {
+  await Bun.write("./cache/_init", "");
+
   const cachedRoot = Bun.file("./cache/root.page");
   const cachedUpload = Bun.file("./cache/upload.page");
 
