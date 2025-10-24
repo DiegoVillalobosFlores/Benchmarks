@@ -1,6 +1,7 @@
 import AppAssetMap from "@/types/AppAssetMap";
 import { ReactNode } from "react";
 import PageBody from "./PageBody";
+import PageHRM from "./PageHRM";
 
 type Props = {
   assetMap: AppAssetMap;
@@ -52,6 +53,7 @@ export default function Page({
         <header>{header}</header>
         {navigation}
         <main>{children}</main>
+        <PageHRM />
       </PageBody>
     </html>
   );

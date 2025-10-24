@@ -18,7 +18,7 @@ const routes = await routesServer({
 
 const server = serve(routes);
 
-const watcher = watch("./cache", async (event, filename) => {
+const cacheWatcher = watch("./cache", async (event, filename) => {
   console.log(`Detected ${event} in ${filename}`);
   const routes = await routesServer({
     SQLClientInstance,
@@ -27,10 +27,17 @@ const watcher = watch("./cache", async (event, filename) => {
   server.reload(routes);
 });
 
+const socket = new WebSocket("ws://localhost:3000/websockets/__dev/hmr");
+
+socket.addEventListener("open", () => {
+  console.log("Socket opened");
+  socket.send(JSON.stringify({ type: "reload" }));
+});
+
 process.on("SIGINT", () => {
   // close watcher when Ctrl-C is pressed
   console.log("Closing watcher...");
-  watcher.close();
+  cacheWatcher.close();
 
   process.exit(0);
 });

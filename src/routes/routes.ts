@@ -1,12 +1,11 @@
 import benchmarksRoutes from "@/routes/api/benchmarks";
 import applicationPagesRoutes from "@/routes/app";
-import AppAssetMap from "@/types/AppAssetMap";
-import AppRouteScripts from "@/types/AppRouteScripts";
 import { SQL } from "bun";
 import { staticFilesRoutes } from "./static/files";
 import BenchmarksServiceInstance from "@/core/services/benchmarks";
 import readCache from "@/utils/readCache";
 import buildClientBundle from "@/utils/buildClientBundle";
+import websocketRoutes from "./websockets/websockets";
 
 type Props = {
   SQLClientInstance: SQL;
@@ -36,6 +35,7 @@ export default async function routesServer({
         cache,
       }),
       ...(await staticFilesRoutes()),
+      ...websocketRoutes(),
     },
 
     async fetch(req) {
@@ -48,6 +48,16 @@ export default async function routesServer({
     development: process.env.NODE_ENV !== "production" && {
       // Echo console logs from the browser to the server
       console: true,
+    },
+
+    websocket: {
+      message: (ws, message) => {
+        ws.send(message);
+      },
+      open: (ws) => {},
+      close: (ws) => {
+        console.log("WebSocket closed");
+      },
     },
   };
 }
