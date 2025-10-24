@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --watch src/index.tsx",
-    "build": "bun build ./src/index.tsx --sourcemap --target=bun --compile --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*' --outfile benchmarks",
-    "start": "NODE_ENV=production bun src/index.tsx"
+    "dev": "bun --watch src/server.tsx",
+    "build": "bun build ./src/server.tsx --sourcemap --target=bun --compile --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*' --outfile benchmarks",
+    "start": "NODE_ENV=production bun src/server.tsx"
   },
   "dependencies": {
     "lucide-react": "0.546.0",

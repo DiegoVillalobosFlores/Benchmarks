@@ -12,6 +12,9 @@ import AppAssetMap from "./types/AppAssetMap";
 await rm("dist", { recursive: true, force: true });
 await rm("cache", { recursive: true, force: true });
 
+await Bun.write("dist/_init", "");
+await Bun.write("cache/_init", "");
+
 const bundledEntrypoints = Object.values<string[]>(entrypoints);
 
 const scripts: {
