@@ -52,7 +52,6 @@ export default function BenchmarkListItem({
       key={benchmark.id}
       style={isSelected ? styles.root.focused : styles.root.default}
       onFocus={onFocus}
-      onMouseEnter={onFocus}
     >
       <h2>{benchmark.id}</h2>
       <h3>{benchmark.name}</h3>

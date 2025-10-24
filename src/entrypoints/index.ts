@@ -1,5 +1,3 @@
-import { pagesRouter } from "@/routes/app";
-import AppAssetMap from "@/types/AppAssetMap";
 import { readdirSync } from "fs";
 
 const contentTypeMap = {
@@ -31,12 +29,6 @@ const entrypoints = readdirSync("./src/entrypoints", { withFileTypes: true })
     },
     {} as Record<string, string[]>,
   );
-
-export const assetMap: AppAssetMap = {
-  globalStyles: "globalStyles.css",
-  favicon: "favicon.svg",
-  font: "font.woff2",
-};
 
 export const assetMapStaticFiles = async () => {
   const staticFiles = readdirSync("./dist", { withFileTypes: true }).filter(

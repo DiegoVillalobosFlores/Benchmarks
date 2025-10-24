@@ -7,6 +7,7 @@ import applicationPagesRoutes from "./routes/app/index";
 import { watch } from "fs";
 import readCache from "./utils/readCache";
 import { rm } from "node:fs/promises";
+import AppAssetMap from "./types/AppAssetMap";
 
 await rm("dist", { recursive: true, force: true });
 await rm("cache", { recursive: true, force: true });
@@ -19,6 +20,12 @@ const scripts: {
 } = {
   root: [],
   upload: [],
+};
+
+const assets: AppAssetMap = {
+  favicon: "",
+  globalStyles: "",
+  font: "",
 };
 
 for (const extensionBundle of bundledEntrypoints) {
@@ -51,7 +58,27 @@ for (const extensionBundle of bundledEntrypoints) {
       ...chunks.map((chunk) => chunk.path.split("/").pop() as string),
     ];
   }
+
+  for (const assetExtensions of extensionBundle) {
+    if (assetExtensions.endsWith(".tsx")) continue;
+    const assetName = assetExtensions.split("/").pop() as string;
+    const assetNameWithoutExtension = assetName.split(".")[0];
+
+    const buildAssets = result.outputs.filter(
+      (output) => output.kind === "asset",
+    );
+
+    if (!assetNameWithoutExtension) continue;
+    if (!Object.keys(assets).includes(assetNameWithoutExtension)) continue;
+
+    assets[assetNameWithoutExtension as keyof typeof assets] =
+      buildAssets[0]?.path.split("/").pop();
+  }
+
+  // console.log(result);
 }
+
+console.log(assets);
 
 const SQLClientInstance = await SQLiteClient();
 
@@ -63,7 +90,12 @@ const cache = await readCache();
 
 const server = serve({
   routes: {
-    ...(await applicationPagesRoutes({ SQLClientInstance, cache, scripts })),
+    ...(await applicationPagesRoutes({
+      SQLClientInstance,
+      cache,
+      scripts,
+      assets,
+    })),
     ...benchmarksRoutes({
       benchmarksServiceInstance,
       cache,
@@ -90,7 +122,12 @@ const watcher = watch("./cache", async (event, filename) => {
 
   server.reload({
     routes: {
-      ...(await applicationPagesRoutes({ SQLClientInstance, cache, scripts })),
+      ...(await applicationPagesRoutes({
+        SQLClientInstance,
+        cache,
+        scripts,
+        assets,
+      })),
       ...benchmarksRoutes({
         benchmarksServiceInstance,
         cache,

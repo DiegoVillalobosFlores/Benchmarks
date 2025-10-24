@@ -1,11 +1,11 @@
 import { SQL } from "bun";
 import { renderToReadableStream } from "react-dom/server";
-import { assetMap } from "@/entrypoints";
 import generateClientProps from "@/utils/generateClientProps";
 import { StrictMode } from "react";
 import BenchmarksPage from "@/components/BenchmarksPage/BenchmarksPage";
 import UploadPage from "@/components/UploadPage/UploadPage";
 import RoutesCache from "@/types/RoutesCache";
+import AppAssetMap from "@/types/AppAssetMap";
 
 type Page = {
   url: string;
@@ -17,7 +17,7 @@ type Router = {
   upload: Page;
 };
 
-export const pagesRouter: Router = {
+const pagesRouter: Router = {
   root: {
     url: "/",
     hydrationScripts: ["root.js", "chunk-fxed1csc.js"],
@@ -32,6 +32,7 @@ export default async function applicationPagesRoutes({
   SQLClientInstance,
   cache,
   scripts,
+  assets,
 }: {
   SQLClientInstance: SQL;
   cache: RoutesCache;
@@ -39,6 +40,7 @@ export default async function applicationPagesRoutes({
     root: string[];
     upload: string[];
   };
+  assets: AppAssetMap;
 }) {
   return {
     [pagesRouter.root.url]: cache.root.hit
@@ -56,11 +58,11 @@ export default async function applicationPagesRoutes({
 
           const stream = await renderToReadableStream(
             <StrictMode>
-              <BenchmarksPage assetMap={assetMap} benchmarks={benchmarks} />
+              <BenchmarksPage assetMap={assets} benchmarks={benchmarks} />
             </StrictMode>,
             {
               bootstrapScriptContent: generateClientProps({
-                assetMap,
+                assetMap: assets,
                 benchmarks,
               }),
               bootstrapModules: scripts.root,
@@ -94,10 +96,10 @@ export default async function applicationPagesRoutes({
 
           const stream = await renderToReadableStream(
             <StrictMode>
-              <UploadPage assetMap={assetMap} />
+              <UploadPage assetMap={assets} />
             </StrictMode>,
             {
-              bootstrapScriptContent: generateClientProps({ assetMap }),
+              bootstrapScriptContent: generateClientProps({ assetMap: assets }),
               bootstrapModules: scripts.upload,
             },
           );
