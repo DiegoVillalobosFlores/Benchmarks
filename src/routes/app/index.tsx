@@ -4,6 +4,8 @@ import { assetMap } from "@/entrypoints";
 import generateClientProps from "@/utils/generateClientProps";
 import { StrictMode } from "react";
 import BenchmarksPage from "@/components/BenchmarksPage/BenchmarksPage";
+import UploadPage from "@/components/UploadPage/UploadPage";
+import RoutesCache from "@/types/RoutesCache";
 
 type Page = {
   url: string;
@@ -12,6 +14,7 @@ type Page = {
 
 type Router = {
   root: Page;
+  upload: Page;
 };
 
 export const pagesRouter: Router = {
@@ -19,31 +22,91 @@ export const pagesRouter: Router = {
     url: "/",
     hydrationScript: "root.js",
   },
+  upload: {
+    url: "/upload",
+    hydrationScript: "upload.js",
+  },
 } as const;
 
-export default function applicationPagesRoutes(SQLClientInstance: SQL) {
+export default async function applicationPagesRoutes(
+  SQLClientInstance: SQL,
+  cache: RoutesCache,
+) {
   return {
-    [pagesRouter.root.url]: async () => {
-      console.time("Compiled /");
-      const benchmarks = await SQLClientInstance`
-        select b.id, g.name, b.created_at from Benchmark b join main.Game G on G.id = b.game_id;
+    [pagesRouter.root.url]: cache.root.hit
+      ? new Response(await cache.root.file.bytes(), {
+          headers: {
+            "Content-Type": "text/html",
+            "Content-Encoding": "gzip",
+          },
+        })
+      : async () => {
+          console.time("Compiled /");
+          const benchmarks = await SQLClientInstance`
+        select b.id, g.name, b.created_at from Benchmark b join main.Game G on G.id = b.game_id order by b.created_at desc;
       `;
 
-      const stream = await renderToReadableStream(
-        <StrictMode>
-          <BenchmarksPage assetMap={assetMap} benchmarks={benchmarks} />
-        </StrictMode>,
-        {
-          bootstrapScriptContent: generateClientProps({ assetMap, benchmarks }),
-          bootstrapModules: [pagesRouter.root.hydrationScript],
+          const stream = await renderToReadableStream(
+            <StrictMode>
+              <BenchmarksPage assetMap={assetMap} benchmarks={benchmarks} />
+            </StrictMode>,
+            {
+              bootstrapScriptContent: generateClientProps({
+                assetMap,
+                benchmarks,
+              }),
+              bootstrapModules: [pagesRouter.root.hydrationScript],
+            },
+          );
+
+          console.log("Writing cached root");
+          const response = new Response(stream);
+          const buffer = await response.arrayBuffer();
+          const compressed = Bun.gzipSync(buffer);
+          await cache.root.file.write(compressed);
+
+          console.timeEnd("Compiled /");
+
+          return new Response(compressed, {
+            headers: {
+              "Content-Type": "text/html",
+              "Content-Encoding": "gzip",
+            },
+          });
         },
-      );
+    [pagesRouter.upload.url]: cache.upload.hit
+      ? new Response(await cache.upload.file.bytes(), {
+          headers: {
+            "Content-Type": "text/html",
+            "Content-Encoding": "gzip",
+          },
+        })
+      : async () => {
+          console.time("Compiled /upload");
 
-      console.timeEnd("Compiled /");
+          const stream = await renderToReadableStream(
+            <StrictMode>
+              <UploadPage assetMap={assetMap} />
+            </StrictMode>,
+            {
+              bootstrapScriptContent: generateClientProps({ assetMap }),
+              bootstrapModules: [pagesRouter.upload.hydrationScript],
+            },
+          );
 
-      return new Response(stream, {
-        headers: { "Content-Type": "text/html" },
-      });
-    },
+          const response = new Response(stream);
+          const buffer = await response.arrayBuffer();
+          const compressed = Bun.gzipSync(buffer);
+          await cache.upload.file.write(compressed);
+
+          console.timeEnd("Compiled /upload");
+
+          return new Response(compressed, {
+            headers: {
+              "Content-Type": "text/html",
+              "Content-Encoding": "gzip",
+            },
+          });
+        },
   };
 }
