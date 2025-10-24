@@ -1,11 +1,14 @@
-import { BenchmarksService } from "@/types/BenchmarkService";
+import { BenchmarksService } from "@/types/BenchmarksService";
+import RoutesCache from "@/types/RoutesCache";
 
 export default async function createBenchmarkRouteHandler({
   request,
   benchmarksServiceInstance,
+  cache,
 }: {
   request: Request;
   benchmarksServiceInstance: BenchmarksService;
+  cache: RoutesCache;
 }): Promise<Response> {
   const formData = await request.formData();
   const file = formData.get("benchmark") as File | null;
@@ -21,6 +24,12 @@ export default async function createBenchmarkRouteHandler({
 
   if (error) {
     return new Response(error.message, { status: error.status });
+  }
+
+  console.log({ cache });
+
+  if (cache.root.hit) {
+    await cache.root.file.delete();
   }
 
   return Response.json(result);
