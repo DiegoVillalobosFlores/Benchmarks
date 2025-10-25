@@ -6,6 +6,7 @@ dist
 /benchmarks
 /cache
 /build
+_init
 
 # code coverage
 coverage
