@@ -19,7 +19,7 @@ const routes = await routesServer({
 const server = serve(routes);
 
 const cacheWatcher = watch("./cache", async (event, filename) => {
-  console.log(`Detected ${event} in ${filename}`);
+  console.log(`🏁 Cached saved in ${filename}`);
   const routes = await routesServer({
     SQLClientInstance,
   });

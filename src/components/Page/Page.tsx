@@ -53,8 +53,8 @@ export default function Page({
         <header>{header}</header>
         {navigation}
         <main>{children}</main>
-        <PageHRM />
       </PageBody>
+      <PageHRM />
     </html>
   );
 }

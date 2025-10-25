@@ -54,10 +54,8 @@ export default async function routesServer({
       message: (ws, message) => {
         ws.send(message);
       },
-      open: (ws) => {},
-      close: (ws) => {
-        console.log("WebSocket closed");
-      },
+      open: () => {},
+      close: () => {},
     },
   };
 }

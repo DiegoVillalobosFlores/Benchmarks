@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const URL = "ws://localhost:3000/websockets/__dev/hmr";
 
 export default function PageHRM() {
-  const socket = new WebSocket(URL);
-
   useEffect(() => {
+    const socket = new WebSocket(URL);
+    console.log("PageHRM initialized");
     const listener = () => {
       console.log("PageHRM opened");
     };
@@ -36,7 +36,7 @@ export default function PageHRM() {
       socket.removeEventListener("error", errorListener);
       socket.removeEventListener("close", closeListener);
     };
-  }, [socket]);
+  }, []);
 
   return <></>;
 }
