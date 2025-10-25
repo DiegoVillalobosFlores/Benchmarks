@@ -23,16 +23,16 @@ export default function Page({
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="font" href={assetMap.font} />
+        <link rel="preconnect" href={assetMap.font} as="font" />
         <link rel="icon" type="image/svg+xml" href={assetMap.favicon} />
-        <link rel="stylesheet" href={assetMap.globalStyles} />
+        <link rel="preconnect" href={assetMap.globalStyles} as="style" />
         <style>{`
           @font-face {
               font-family: "Quicksand";
               font-optical-sizing: auto;
               font-weight: 200;
               font-style: normal;
-              font-display: block;
+              font-display: swap;
               src: url(${assetMap.font}) format(woff2);
           }
 
@@ -44,7 +44,32 @@ export default function Page({
               font-optical-sizing: auto;
               font-style: normal;
               font-weight: 200;
-              font-display: block;
+          }
+
+          body {
+              display: flex;
+              flex-direction: column;
+              height: 100dvh;
+              background-color: black;
+              color: white;
+              padding: 32px;
+              gap: 16px;
+          }
+
+          main {
+              height: 100%
+          }
+
+          main {
+              display: contents;
+          }
+
+          section {
+              display: contents;
+          }
+
+          ul {
+              list-style-type: none;
           }
           `}</style>
         <title>{title}</title>
