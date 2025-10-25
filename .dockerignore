@@ -20,3 +20,4 @@ benchmarks.db
 benchmarks.db-journal
 benchmarks.db-wal
 benchmarks.db-shm
+build*

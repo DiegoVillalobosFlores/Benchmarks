@@ -5,6 +5,7 @@ node_modules
 dist
 /benchmarks
 /cache
+/build
 
 # code coverage
 coverage
