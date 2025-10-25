@@ -1,28 +1,52 @@
 import { serve } from "bun";
 import SQLiteClient from "./core/clients/sql/sqlite";
 import { watch } from "fs";
-import { rm } from "node:fs/promises";
 import routesServer from "./routes/routes";
+import { rm } from "node:fs/promises";
+import buildClientBundle from "./utils/buildClientBundle";
 
-await rm("dist", { recursive: true, force: true });
-await rm("cache", { recursive: true, force: true });
+const fileDir = ".";
 
-await Bun.write("dist/_init", "");
-await Bun.write("cache/_init", "");
+const SQLClientInstance = await SQLiteClient({
+  filename: `${fileDir}/benchmarks.db`,
+});
 
-const SQLClientInstance = await SQLiteClient();
+console.log("Starting server...");
+if (process.env.NODE_ENV === "development") {
+  console.log("Building client bundle...");
+
+  await rm("dist", { recursive: true, force: true });
+  await rm("cache", { recursive: true, force: true });
+  await rm("build", { recursive: true, force: true });
+
+  await buildClientBundle();
+  console.log("Client bundle built");
+
+  console.log("Running db migrations");
+  await SQLClientInstance.file("./src/core/sql/migrations/1.sql");
+  console.log("Migrations completed");
+}
+
+const { scripts, assets } = await Bun.file("./build/manifest.json").json();
 
 const routes = await routesServer({
   SQLClientInstance,
+  scripts,
+  assets,
 });
 
 const server = serve(routes);
 
 const cacheWatcher = watch("./cache", async (event, filename) => {
-  console.log(`🏁 Cached saved in ${filename}`);
+  console.clear();
+  const startTime = Date.now();
+  console.log(`Cached saved in ${filename}`, "reloading server");
   const routes = await routesServer({
     SQLClientInstance,
+    scripts,
+    assets,
   });
+  console.log(`🏁 Reloaded in ${Date.now() - startTime}ms`);
 
   server.reload(routes);
 });

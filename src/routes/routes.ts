@@ -4,23 +4,26 @@ import { SQL } from "bun";
 import { staticFilesRoutes } from "./static/files";
 import BenchmarksServiceInstance from "@/core/services/benchmarks";
 import readCache from "@/utils/readCache";
-import buildClientBundle from "@/utils/buildClientBundle";
 import websocketRoutes from "./websockets/websockets";
+import AppRouteScripts from "@/types/AppRouteScripts";
+import AppAssetMap from "@/types/AppAssetMap";
 
 type Props = {
   SQLClientInstance: SQL;
+  scripts: AppRouteScripts;
+  assets: AppAssetMap;
 };
 
 export default async function routesServer({
   SQLClientInstance,
+  scripts,
+  assets,
 }: Props): Promise<Bun.Serve.Options<any>> {
   const benchmarksServiceInstance = await BenchmarksServiceInstance({
     sqlClient: SQLClientInstance,
   });
 
   const cache = await readCache();
-
-  const { scripts, assets } = await buildClientBundle();
 
   return {
     routes: {
@@ -36,6 +39,19 @@ export default async function routesServer({
       }),
       ...(await staticFilesRoutes()),
       ...websocketRoutes(),
+      "/.well-known/appspecific/com.chrome.devtools.json": new Response(
+        JSON.stringify({
+          workspace: {
+            root: process.cwd(),
+            uuid: Bun.randomUUIDv7(),
+          },
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      ),
     },
 
     async fetch(req) {
