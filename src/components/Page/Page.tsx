@@ -79,7 +79,7 @@ export default function Page({
         {navigation}
         <main>{children}</main>
       </PageBody>
-      <PageHRM />
+      {process.env.NODE_ENV === "development" && <PageHRM />}
     </html>
   );
 }
