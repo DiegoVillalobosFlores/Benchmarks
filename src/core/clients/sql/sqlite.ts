@@ -1,10 +1,13 @@
 import { SQL } from "bun";
 
-export default async function SQLiteClient() {
+type Props = {
+  filename: string;
+};
+
+export default async function SQLiteClient({ filename }: Props) {
   const client = new SQL({
     adapter: "sqlite",
-    filename: "benchmarks.db",
-    create: true,
+    filename,
     readwrite: true,
   });
 
