@@ -16,7 +16,5 @@ export default async function SQLiteClient({ filename }: Props) {
   // Set journal mode to WAL for better concurrency
   await client`PRAGMA journal_mode = WAL`;
 
-  await client.file("src/core/clients/sql/migrations/1.sql");
-
   return client;
 }
