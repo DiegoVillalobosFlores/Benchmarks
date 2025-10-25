@@ -1,6 +1,6 @@
 # use the official Bun image
 # see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:1.3.1-alpine AS base
+FROM docker.io/oven/bun:1.3.1-alpine AS base
 WORKDIR /usr/src/app
 
 # install dependencies into temp directory
@@ -23,18 +23,21 @@ COPY . .
 
 # [optional] tests & build
 ENV NODE_ENV=production
+RUN bun run db:sqlite:init
 RUN bun run build
+RUN bun run compile
 
 # copy production dependencies and source code into final image
 FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app/package.json .
 COPY --from=prerelease /usr/src/app/benchmarks .
-COPY --from=prerelease /usr/src/app/ .
-RUN mkdir -p /usr/src/app/dist
-RUN mkdir -p /usr/src/app/cache
+COPY --from=prerelease /usr/src/app/build ./build/
+COPY --from=prerelease /usr/src/app/cache ./cache/
+COPY --from=prerelease /usr/src/app/dist ./dist/
+COPY --from=prerelease /usr/src/app/benchmarks.db .
+RUN chown -R bun:bun .
 
 # run the app
-USER root
+USER bun
 EXPOSE 3000/tcp
 ENTRYPOINT [ "./benchmarks" ]
