@@ -4,8 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --watch src/server.tsx",
-    "build": "bun build ./src/server.tsx --sourcemap --target=bun --compile --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*' --outfile benchmarks",
+    "dev": "NODE_ENV=development bun --watch src/server.tsx",
+    "build": "bun ./src/build.ts",
+    "db:sqlite:init": "bun ./src/initSQLite.ts",
+    "compile": "NODE_ENV=production bun build ./src/server.tsx --sourcemap --target=bun --compile --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*' --outfile benchmarks --produc",
     "start": "NODE_ENV=production bun src/server.tsx"
   },
   "dependencies": {
