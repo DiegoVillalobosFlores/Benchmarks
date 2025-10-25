@@ -82,7 +82,7 @@ export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
     <Page
       assetMap={assetMap}
       title="Benchmarks"
-      header={<h1>Welcome to Benchmarks</h1>}
+      header={<h1>Benchmarks</h1>}
       navigation={
         <BenchmarksPageNavigation
           activeControl={activeControl}
