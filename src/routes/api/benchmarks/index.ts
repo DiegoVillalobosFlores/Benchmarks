@@ -15,7 +15,6 @@ export default function benchmarksRoutes({
 }) {
   return {
     [benchmarksAPIRouter.create]: async (request: Request) => {
-      console.log(cache);
       return createBenchmarkRouteHandler({
         request,
         benchmarksServiceInstance,
