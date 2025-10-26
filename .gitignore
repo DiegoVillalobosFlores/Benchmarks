@@ -33,6 +33,7 @@ coverage
 .DS_Store
 
 # SQLite
+/sqlite
 benchmarks.db
 benchmarks.db-journal
 benchmarks.db-wal
