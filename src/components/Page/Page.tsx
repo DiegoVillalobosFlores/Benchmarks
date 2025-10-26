@@ -5,19 +5,11 @@ import PageHRM from "./PageHRM";
 
 type Props = {
   assetMap: AppAssetMap;
-  children: ReactNode;
   title: string;
-  header: ReactNode;
-  navigation: ReactNode;
+  children: ReactNode;
 };
 
-export default function Page({
-  assetMap,
-  children,
-  title,
-  header,
-  navigation,
-}: Props) {
+export default function Page({ assetMap, children, title }: Props) {
   return (
     <html>
       <head>
@@ -25,7 +17,7 @@ export default function Page({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="preconnect" href={assetMap.font} as="font" />
         <link rel="icon" type="image/svg+xml" href={assetMap.favicon} />
-        <link rel="preconnect" href={assetMap.globalStyles} as="style" />
+        <link rel="stylesheet" href={assetMap.globalStyles} as="style" />
         <style>{`
           @font-face {
               font-family: "Quicksand";
@@ -74,11 +66,7 @@ export default function Page({
           `}</style>
         <title>{title}</title>
       </head>
-      <PageBody>
-        <header>{header}</header>
-        {navigation}
-        <main>{children}</main>
-      </PageBody>
+      <PageBody>{children}</PageBody>
       {process.env.NODE_ENV === "development" && <PageHRM />}
     </html>
   );

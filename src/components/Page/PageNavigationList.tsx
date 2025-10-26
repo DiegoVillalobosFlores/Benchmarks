@@ -10,12 +10,10 @@ export default function PageNavigationList({ title, children }: Props) {
     <div
       style={{
         display: "flex",
-        flexDirection: "column",
         gap: "8px",
         flexWrap: "wrap",
       }}
     >
-      <h3>{title}</h3>
       <ul
         style={{
           display: "flex",
