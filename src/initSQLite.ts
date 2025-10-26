@@ -1,6 +1,11 @@
 import SQLiteClient from "./core/clients/sql/sqlite";
 
-const fileDir = ".";
+const fileDir = process.env.SQLITE_DIR;
+
+if (!fileDir) {
+  console.error("SQLITE_DIR environment variable is not set");
+  process.exit(1);
+}
 
 console.log("Initializing SQLite database...");
 

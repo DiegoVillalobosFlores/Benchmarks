@@ -2,8 +2,7 @@ import BenchmarkList from "@/components/BenchmarkList/BenchmarkList";
 import BenchmarksPageNavigation, {
   Control,
 } from "@/components/BenchmarksPage/BenchmarksPageNavigation";
-import Page from "@/components/Page/Page";
-import PageSection from "@/components/Page/PageSection";
+import Page from "@/components/Page";
 import AppAssetMap from "@/types/AppAssetMap";
 import useKeyboardNavigation from "@/utils/useKeyboardNavigation";
 import { ComponentProps, useEffect, useState } from "react";
@@ -74,16 +73,21 @@ export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
       setActiveControl("upload");
       setFocusedControl("upload");
       setClearControls(false);
-      window.location.assign("/upload");
+      window.location.href = "/upload";
     },
   });
 
   return (
-    <Page
-      assetMap={assetMap}
-      title="Benchmarks"
-      header={<h1>Benchmarks</h1>}
-      navigation={
+    <Page.Shell assetMap={assetMap} title="Benchmarks">
+      <Page.Header title="Benchmarks" />
+      <Page.Main>
+        <Page.Section>
+          <BenchmarkList
+            benchmarks={benchmarks}
+            selectedBenchmarkIndex={selectedBenchmarkIndex}
+            onBenchmarkFocus={setSelectedBenchmarkIndex}
+          />
+        </Page.Section>
         <BenchmarksPageNavigation
           activeControl={activeControl}
           focusedControl={focusedControl}
@@ -111,15 +115,7 @@ export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
             setClearControls(false);
           }}
         />
-      }
-    >
-      <PageSection>
-        <BenchmarkList
-          benchmarks={benchmarks}
-          selectedBenchmarkIndex={selectedBenchmarkIndex}
-          onBenchmarkFocus={setSelectedBenchmarkIndex}
-        />
-      </PageSection>
-    </Page>
+      </Page.Main>
+    </Page.Shell>
   );
 }

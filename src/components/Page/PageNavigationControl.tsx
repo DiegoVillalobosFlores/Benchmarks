@@ -6,6 +6,7 @@ type Props = {
   isFocused: boolean;
   isActive: boolean;
   children: ReactNode;
+  icon: ReactNode;
 };
 
 const styles = {
@@ -36,6 +37,7 @@ export default function PageNavigationControl({
   isActive,
   onFocus,
   onClick,
+  icon,
 }: Props) {
   const style = {
     ...styles.root.default,
@@ -53,7 +55,8 @@ export default function PageNavigationControl({
       }}
       onMouseEnter={onFocus}
     >
-      {children}
+      {icon}
+      <h3>{children}</h3>
     </li>
   );
 }

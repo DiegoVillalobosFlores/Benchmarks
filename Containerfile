@@ -23,7 +23,7 @@ COPY . .
 
 # [optional] tests & build
 ENV NODE_ENV=production
-RUN bun run db:sqlite:init
+# RUN bun run db:sqlite:init
 RUN bun run build
 RUN bun run compile
 
@@ -34,7 +34,7 @@ COPY --from=prerelease /usr/src/app/benchmarks .
 COPY --from=prerelease /usr/src/app/build ./build/
 COPY --from=prerelease /usr/src/app/cache ./cache/
 COPY --from=prerelease /usr/src/app/dist ./dist/
-COPY --from=prerelease /usr/src/app/benchmarks.db .
+# COPY --from=prerelease /usr/src/app/benchmarks.db .
 RUN chown -R bun:bun .
 
 # run the app
