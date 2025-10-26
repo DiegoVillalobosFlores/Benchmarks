@@ -1,9 +1,8 @@
 import AppAssetMap from "@/types/AppAssetMap";
 import FileUpload from "../FileUpload/FileUpload";
-import Page from "../Page/Page";
+import Page from "../Page";
 import UploadPageNavigation from "./UploadPageNavigation";
 import { ComponentProps, useEffect, useState } from "react";
-import PageSection from "../Page/PageSection";
 import useKeyboardNavigation from "@/utils/useKeyboardNavigation";
 
 type Props = {
@@ -28,23 +27,11 @@ export default function UploadPage({ assetMap }: Props) {
   }, [focusedControl, clearControls]);
 
   useKeyboardNavigation({
-    // ArrowUp: () => {
-    //   // setFocusedControl("moveUp");
-    //   setClearControls(true);
-    // },
-    // ArrowDown: () => {
-    //   // setFocusedControl("moveDown");
-    //   setClearControls(true);
-    // },
     ArrowLeft: () => {
       setFocusedControl("moveBack");
       setClearControls(true);
       window.history.back();
     },
-    // Enter: () => {
-    //   setFocusedControl("go");
-    //   setClearControls(true);
-    // },
     1: () => {
       setFocusedControl("categories");
       setClearControls(true);
@@ -62,36 +49,31 @@ export default function UploadPage({ assetMap }: Props) {
   });
 
   return (
-    <Page
-      assetMap={assetMap}
-      title="Benchmarks - Upload"
-      header={<h1>Upload a new benchmark</h1>}
-      navigation={
-        <UploadPageNavigation
-          onClick={(control) => {
-            if (control === "upload") {
-              setActiveControl("upload");
-            }
-            if (control === "categories") {
-              setActiveControl("categories");
-            }
-            if (control === "benchmarks") {
-              setActiveControl("benchmarks");
-              window.location.assign("/");
-            }
-          }}
-          activeControl={activeControl}
-          focusedControl={focusedControl}
-          onFocus={(control) => {
-            setFocusedControl(control);
-            setClearControls(false);
-          }}
-        />
-      }
-    >
-      <PageSection>
+    <Page.Shell assetMap={assetMap} title="Benchmarks - Upload">
+      <Page.Header title="New Benchmark" />
+      <Page.Section>
         <FileUpload onUploadSuccess={() => (window.location.href = "/")} />
-      </PageSection>
-    </Page>
+      </Page.Section>
+      <UploadPageNavigation
+        onClick={(control) => {
+          if (control === "upload") {
+            setActiveControl("upload");
+          }
+          if (control === "categories") {
+            setActiveControl("categories");
+          }
+          if (control === "benchmarks") {
+            setActiveControl("benchmarks");
+            window.location.assign("/");
+          }
+        }}
+        activeControl={activeControl}
+        focusedControl={focusedControl}
+        onFocus={(control) => {
+          setFocusedControl(control);
+          setClearControls(false);
+        }}
+      />
+    </Page.Shell>
   );
 }

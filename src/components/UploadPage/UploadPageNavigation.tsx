@@ -2,6 +2,7 @@ import { MoveLeft } from "lucide-react";
 import PageNavigation from "../Page/PageNavigation";
 import PageNavigationControl from "../Page/PageNavigationControl";
 import PageNavigationList from "../Page/PageNavigationList";
+import NavigationControl from "@/types/NavigationControl";
 
 type Control = "categories" | "benchmarks" | "upload" | "moveBack";
 
@@ -12,6 +13,32 @@ type Props = {
   onClick: (control: Control) => void;
 };
 
+const navigationControls: NavigationControl<Control>[] = [
+  {
+    id: "categories",
+    label: "Categories",
+    icon: <>1</>,
+  },
+  {
+    id: "benchmarks",
+    label: "Benchmarks",
+    icon: <>2</>,
+  },
+  {
+    id: "upload",
+    label: "Upload",
+    icon: <>3</>,
+  },
+];
+
+const selectionControls: NavigationControl<Control>[] = [
+  {
+    id: "moveBack",
+    label: "Go Back",
+    icon: <MoveLeft />,
+  },
+];
+
 export default function UploadPageNavigation({
   activeControl,
   focusedControl,
@@ -21,41 +48,32 @@ export default function UploadPageNavigation({
   return (
     <PageNavigation>
       <PageNavigationList title="Navigation:">
-        <PageNavigationControl
-          isActive={activeControl === "categories"}
-          isFocused={focusedControl === "categories"}
-          onFocus={() => onFocus("categories")}
-          onClick={() => onClick("categories")}
-        >
-          <h3>1. Categories</h3>
-        </PageNavigationControl>
-        <PageNavigationControl
-          isActive={activeControl === "benchmarks"}
-          isFocused={focusedControl === "benchmarks"}
-          onFocus={() => onFocus("benchmarks")}
-          onClick={() => onClick("benchmarks")}
-        >
-          <h3>2. Benchmarks</h3>
-        </PageNavigationControl>
-        <PageNavigationControl
-          isActive={activeControl === "upload"}
-          isFocused={focusedControl === "upload"}
-          onFocus={() => onFocus("upload")}
-          onClick={() => onClick("upload")}
-        >
-          <h3>3. Upload</h3>
-        </PageNavigationControl>
+        {navigationControls.map((control) => (
+          <PageNavigationControl
+            key={control.id}
+            onClick={() => onClick(control.id)}
+            isActive={activeControl === control.id}
+            isFocused={focusedControl === control.id}
+            onFocus={() => onFocus(control.id)}
+            icon={control.icon}
+          >
+            {control.label}
+          </PageNavigationControl>
+        ))}
       </PageNavigationList>
-      <PageNavigationList title="Controls:">
-        <PageNavigationControl
-          isActive={activeControl === "moveBack"}
-          isFocused={focusedControl === "moveBack"}
-          onFocus={() => onFocus("moveBack")}
-          onClick={() => onClick("moveBack")}
-        >
-          <MoveLeft size={16} />
-          <h3>Move Back</h3>
-        </PageNavigationControl>
+      <PageNavigationList title="Selection:">
+        {selectionControls.map((control) => (
+          <PageNavigationControl
+            key={control.id}
+            onClick={() => onClick(control.id)}
+            isActive={activeControl === control.id}
+            isFocused={focusedControl === control.id}
+            onFocus={() => onFocus(control.id)}
+            icon={control.icon}
+          >
+            {control.label}
+          </PageNavigationControl>
+        ))}
       </PageNavigationList>
     </PageNavigation>
   );
