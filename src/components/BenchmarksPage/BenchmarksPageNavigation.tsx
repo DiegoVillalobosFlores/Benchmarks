@@ -7,7 +7,7 @@ import {
 import PageNavigation from "../Page/PageNavigation";
 import PageNavigationList from "../Page/PageNavigationList";
 import PageNavigationControl from "../Page/PageNavigationControl";
-import { ReactNode } from "react";
+import NavigationControl from "@/types/NavigationControl";
 
 export type Control =
   | "categories"
@@ -25,13 +25,7 @@ type Props = {
   onClick: (control: Control) => void;
 };
 
-type NavigationControl = {
-  id: Control;
-  label: string;
-  icon: ReactNode;
-};
-
-const navigationControls: NavigationControl[] = [
+const navigationControls: NavigationControl<Control>[] = [
   {
     id: "categories",
     label: "Categories",
@@ -49,7 +43,7 @@ const navigationControls: NavigationControl[] = [
   },
 ];
 
-const selectionControls: NavigationControl[] = [
+const selectionControls: NavigationControl<Control>[] = [
   {
     id: "moveDown",
     label: "Next",
