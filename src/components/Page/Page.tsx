@@ -40,7 +40,7 @@ export default function Page({
               margin: 0;
               padding: 0;
               box-sizing: border-box;
-              font-family: "Quicksand", system-ui;
+              font-family: system-ui;
               font-optical-sizing: auto;
               font-style: normal;
               font-weight: 200;
