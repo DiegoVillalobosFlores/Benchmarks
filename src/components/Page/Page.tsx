@@ -11,13 +11,17 @@ type Props = {
 
 export default function Page({ assetMap, children, title }: Props) {
   return (
-    <html>
+    <html lang="en">
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+          name="description"
+          content="Simple site to view, store and share all the benchmarks from different sources"
+        />
         <link rel="preconnect" href={assetMap.font} as="font" />
         <link rel="icon" type="image/svg+xml" href={assetMap.favicon} />
-        <link rel="stylesheet" href={assetMap.globalStyles} as="style" />
+        <link rel="preconnect" href={assetMap.globalStyles} as="style" />
         <style>{`
           @font-face {
               font-family: "Quicksand";
