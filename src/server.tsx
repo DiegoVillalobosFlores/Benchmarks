@@ -5,7 +5,11 @@ import routesServer from "./routes/routes";
 import { rm } from "node:fs/promises";
 import buildClientBundle from "./utils/buildClientBundle";
 
-const fileDir = ".";
+const fileDir = process.env.SQLITE_DIR;
+
+if (!fileDir) {
+  throw new Error("SQLITE_DIR environment variable not set");
+}
 
 const SQLClientInstance = await SQLiteClient({
   filename: `${fileDir}/benchmarks.db`,
