@@ -25,12 +25,12 @@ COPY . .
 ENV NODE_ENV=production
 # RUN bun run db:sqlite:init
 RUN bun run build
-RUN bun run compile
+RUN bun run compile:linux:modern
 
 # copy production dependencies and source code into final image
 FROM base AS release
 COPY --from=prerelease /usr/src/app/package.json .
-COPY --from=prerelease /usr/src/app/benchmarks .
+COPY --from=prerelease /usr/src/app/benchmarks-linux-modern .
 COPY --from=prerelease /usr/src/app/build ./build/
 COPY --from=prerelease /usr/src/app/cache ./cache/
 COPY --from=prerelease /usr/src/app/dist ./dist/
@@ -40,4 +40,4 @@ RUN chown -R bun:bun .
 # run the app
 USER bun
 EXPOSE 3000/tcp
-ENTRYPOINT [ "./benchmarks" ]
+ENTRYPOINT [ "./benchmarks-linux-modern" ]

@@ -15,7 +15,16 @@ bun dev
 
 To run for production:
 
+Create a `.env.local` file with the following content:
+
+```
+SQLITE_DIR=./sqlite
+```
+
+Then run:
+
 ```bash
+bun build
 bun start
 ```
 

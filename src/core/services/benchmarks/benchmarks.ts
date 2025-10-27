@@ -1,4 +1,5 @@
 import Benchmark from "@/types/Benchmark";
+import log from "@/utils/logger";
 import { sql, SQL } from "bun";
 
 type ServiceResult<T> =
@@ -28,7 +29,7 @@ export default function BenchmarksService({ sqlClient }: { sqlClient: SQL }) {
 
       const header = valuesWithHeader[0].split(",");
 
-      console.log(header);
+      log(header);
 
       const dataPoints = valuesWithHeader.toSpliced(0, 1).map((line) => {
         const dataPoint = {};
@@ -42,7 +43,7 @@ export default function BenchmarksService({ sqlClient }: { sqlClient: SQL }) {
         return dataPoint;
       });
 
-      // console.log(dataPoints);
+      // log(dataPoints);
 
       const [benchmark] = await sqlClient<Array<{ id: number }>>`
         INSERT INTO "Benchmark" ${sql({ game_id })}
@@ -55,7 +56,7 @@ export default function BenchmarksService({ sqlClient }: { sqlClient: SQL }) {
         };
       }
 
-      console.log(dataPoints.length);
+      log(dataPoints.length);
 
       await sqlClient.begin(async (tx) => {
         for (const metric of dataPoints) {
@@ -67,7 +68,7 @@ export default function BenchmarksService({ sqlClient }: { sqlClient: SQL }) {
         select AVG(frametime), AVG(fps), AVG(gpu_power), AVG(gpu_core_clock) from BenchmarkMetric where benchmark_id = ${benchmark.id};
       `;
 
-      console.log(metrics);
+      log(metrics);
 
       return { result: metrics };
     },

@@ -1,4 +1,5 @@
 import SQLiteClient from "./core/clients/sql/sqlite";
+import log from "./utils/logger";
 
 const fileDir = process.env.SQLITE_DIR;
 
@@ -7,7 +8,7 @@ if (!fileDir) {
   process.exit(1);
 }
 
-console.log("Initializing SQLite database...");
+log("Initializing SQLite database...");
 
 const startTime = Date.now();
 
@@ -17,6 +18,6 @@ const client = await SQLiteClient({ filename: `${fileDir}/benchmarks.db` });
 
 await client.file("./src/core/sql/migrations/1.sql");
 
-console.log(`SQLite database initialized in ${Date.now() - startTime}ms`);
+log(`SQLite database initialized in ${Date.now() - startTime}ms`);
 
 process.exit(0);

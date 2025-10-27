@@ -69,7 +69,6 @@ export default async function applicationPagesRoutes({
             },
           );
 
-          console.log("Writing cached root");
           const response = new Response(stream);
           const buffer = await response.arrayBuffer();
           const compressed = Bun.gzipSync(buffer);
