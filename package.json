@@ -7,7 +7,9 @@
     "dev": "NODE_ENV=development bun --watch src/server.tsx",
     "build": "bun ./src/build.ts",
     "db:sqlite:init": "bun ./src/initSQLite.ts",
-    "compile": "NODE_ENV=production bun build ./src/server.tsx --sourcemap --target=bun --compile --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*' --outfile benchmarks --produc",
+    "compile:linux:modern": "NODE_ENV=production bun build --compile ./src/server.tsx --sourcemap --target=bun-linux-x64-modern  --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*' --outfile benchmarks-linux-modern --production",
+    "compile:macos:arm64": "NODE_ENV=production bun build --compile ./src/server.tsx --sourcemap --target=bun-darwin-arm64  --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*' --outfile benchmarks-macos-arm64 --production",
+    "compile:windows:modern": "NODE_ENV=production bun build --compile ./src/server.tsx --sourcemap --target=bun-windows-x64-modern  --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*' --outfile benchmarks.exe --production",
     "start": "NODE_ENV=production bun src/server.tsx"
   },
   "dependencies": {
