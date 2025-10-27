@@ -4,7 +4,9 @@ import { watch } from "fs";
 import routesServer from "./routes/routes";
 import { rm } from "node:fs/promises";
 import buildClientBundle from "./utils/buildClientBundle";
+import log from "./utils/logger";
 
+const serverStartTime = Date.now();
 const fileDir = process.env.SQLITE_DIR;
 
 if (!fileDir) {
@@ -15,20 +17,20 @@ const SQLClientInstance = await SQLiteClient({
   filename: `${fileDir}/benchmarks.db`,
 });
 
-console.log("Starting server...");
+log("Starting server...");
 if (process.env.NODE_ENV === "development") {
-  console.log("Building client bundle...");
+  log("Building client bundle...");
 
   await rm("dist", { recursive: true, force: true });
   await rm("cache", { recursive: true, force: true });
   await rm("build", { recursive: true, force: true });
 
   await buildClientBundle();
-  console.log("Client bundle built");
+  log("✅ Client bundle built");
 
-  console.log("Running db migrations");
+  log("Running db migrations...");
   await SQLClientInstance.file("./src/core/sql/migrations/1.sql");
-  console.log("Migrations completed");
+  log("✅ Migrations completed");
 }
 
 const { scripts, assets } = await Bun.file("./build/manifest.json").json();
@@ -42,32 +44,38 @@ const routes = await routesServer({
 const server = serve(routes);
 
 const cacheWatcher = watch("./cache", async (event, filename) => {
-  console.clear();
   const startTime = Date.now();
-  console.log(`Cached saved in ${filename}`, "reloading server");
   const routes = await routesServer({
     SQLClientInstance,
     scripts,
     assets,
   });
-  console.log(`🏁 Reloaded in ${Date.now() - startTime}ms`);
+  log(
+    `🏁 Reloaded server in ${Date.now() - startTime}ms with new cache ${filename}`,
+  );
 
   server.reload(routes);
 });
 
-const socket = new WebSocket("ws://localhost:3000/websockets/__dev/hmr");
+if (process.env.NODE_ENV === "development") {
+  log("Connecting to HMR websocket...");
+  const socket = new WebSocket("ws://localhost:3000/websockets/__dev/hmr");
 
-socket.addEventListener("open", () => {
-  console.log("Socket opened");
-  socket.send(JSON.stringify({ type: "reload" }));
-});
+  socket.addEventListener("open", () => {
+    log("✅ HMR websocket connected");
+    socket.send(JSON.stringify({ type: "reload" }));
+  });
+}
 
 process.on("SIGINT", () => {
   // close watcher when Ctrl-C is pressed
-  console.log("Closing watcher...");
+  log("Closing cache watcher...");
   cacheWatcher.close();
 
   process.exit(0);
 });
 
-console.log(`🚀 Server running at ${server.url}`);
+const serverStartEndTime = Date.now();
+log(
+  `🚀 Server started in ${serverStartEndTime - serverStartTime}ms at ${server.url}`,
+);

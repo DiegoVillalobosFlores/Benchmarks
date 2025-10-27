@@ -1,5 +1,6 @@
 import { BenchmarksService } from "@/types/BenchmarksService";
 import RoutesCache from "@/types/RoutesCache";
+import log from "@/utils/logger";
 
 export default async function createBenchmarkRouteHandler({
   request,
@@ -26,7 +27,7 @@ export default async function createBenchmarkRouteHandler({
     return new Response(error.message, { status: error.status });
   }
 
-  console.log({ cache });
+  log({ cache });
 
   if (cache.root.hit) {
     await cache.root.file.delete();
