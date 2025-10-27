@@ -4,6 +4,9 @@ node_modules
 # output
 dist
 /benchmarks
+/benchmarks-linux-modern
+/benchmarks.exe
+/benchmarks-macos-arm64
 /cache
 /build
 _init
