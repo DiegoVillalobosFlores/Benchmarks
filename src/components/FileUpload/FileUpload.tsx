@@ -1,4 +1,3 @@
-import { benchmarksAPIRouter } from "@/routes/api/benchmarks";
 import { useState, ChangeEvent, useRef } from "react";
 
 type Props = {
@@ -17,7 +16,7 @@ export default function FileUpload({ onUploadSuccess }: Props) {
       const formData = new FormData();
       formData.append("benchmark", file);
 
-      const response = await fetch(benchmarksAPIRouter.create, {
+      const response = await fetch(`/categories/${1}/benchmarks/create`, {
         method: "POST",
         body: formData,
       });
