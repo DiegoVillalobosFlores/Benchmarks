@@ -26,10 +26,14 @@ export default async function BenchmarksRoutes() {
           select b.id, g.name, b.created_at from Benchmark b join main.Game G on G.id = b.game_id order by b.created_at desc;
         `;
 
-  const filePath = Bun.fileURLToPath(import.meta.url.split(".")[0]);
+  const contextKey = "categories/[categoryId]/benchmarks/benchmarks";
 
-  const pageBuildContext =
-    buildManifest[filePath.split("app/").pop().split(".")[0]];
+  const pageBuildContext = buildManifest[contextKey];
+
+  if (!pageBuildContext)
+    throw new Error(
+      "Unable to find page build context with key: " + contextKey,
+    );
 
   const { prelude } = await prerender(
     page.default({
