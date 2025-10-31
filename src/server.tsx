@@ -1,10 +1,15 @@
 import { serve } from "bun";
 import SQLiteClient from "./core/clients/sql/sqlite";
-import { watch } from "fs";
 import routesServer from "./routes/routes";
 import { rm } from "node:fs/promises";
 import buildClientBundle from "./utils/buildClientBundle";
 import log from "./utils/logger";
+import { subscribe } from "valtio/vanilla";
+import serverContext, {
+  initServerContext,
+  setServerContextRoutes,
+} from "./utils/serverContext";
+import BenchmarksServiceInstance from "./core/services/benchmarks";
 
 const serverStartTime = Date.now();
 const fileDir = process.env.SQLITE_DIR;
@@ -33,28 +38,24 @@ if (process.env.NODE_ENV === "development") {
   log("✅ Migrations completed");
 }
 
-const { scripts, assets } = await Bun.file("./build/manifest.json").json();
+const buildManifest = await Bun.file("./build/manifest.json").json();
 
-const routes = await routesServer({
-  SQLClientInstance,
-  scripts,
-  assets,
+initServerContext({
+  buildManifest,
+  serviceInstances: {
+    benchmarksServiceInstance: await BenchmarksServiceInstance({
+      sqlClient: SQLClientInstance,
+    }),
+  },
+  sqlClient: SQLClientInstance,
 });
+
+const routes = await routesServer();
 
 const server = serve(routes);
 
-const cacheWatcher = watch("./cache", async (event, filename) => {
-  const startTime = Date.now();
-  const routes = await routesServer({
-    SQLClientInstance,
-    scripts,
-    assets,
-  });
-  log(
-    `🏁 Reloaded server in ${Date.now() - startTime}ms with new cache ${filename}`,
-  );
-
-  server.reload(routes);
+setServerContextRoutes({
+  ...routes,
 });
 
 if (process.env.NODE_ENV === "development") {
@@ -67,10 +68,23 @@ if (process.env.NODE_ENV === "development") {
   });
 }
 
+const serverContextSubscriber = subscribe(
+  serverContext,
+  async () => {
+    // log("Server context updated", "new context", serverContext);
+    const startTime = Date.now();
+    const routes = await routesServer();
+    log(`🏁 Reloaded server in ${Date.now() - startTime}ms with new context`);
+
+    server.reload(routes);
+  },
+  true,
+);
+
 process.on("SIGINT", () => {
   // close watcher when Ctrl-C is pressed
   log("Closing cache watcher...");
-  cacheWatcher.close();
+  serverContextSubscriber();
 
   process.exit(0);
 });

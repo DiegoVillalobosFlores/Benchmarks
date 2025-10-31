@@ -3,16 +3,15 @@ import BenchmarksPageNavigation, {
   Control,
 } from "@/components/BenchmarksPage/BenchmarksPageNavigation";
 import Page from "@/components/Page";
-import AppAssetMap from "@/types/AppAssetMap";
 import useKeyboardNavigation from "@/utils/useKeyboardNavigation";
 import { ComponentProps, useEffect, useState } from "react";
 
 type Props = {
-  assetMap: AppAssetMap;
+  readonly assetLinks: ComponentProps<typeof Page.Shell>["assetLinks"];
   benchmarks: ComponentProps<typeof BenchmarkList>["benchmarks"];
 };
 
-export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
+export default function BenchmarksPage({ benchmarks, assetLinks }: Props) {
   const [selectedBenchmarkIndex, setSelectedBenchmarkIndex] = useState<
     number | null
   >(null);
@@ -78,7 +77,7 @@ export default function BenchmarksPage({ assetMap, benchmarks }: Props) {
   });
 
   return (
-    <Page.Shell assetMap={assetMap} title="Benchmarks">
+    <Page.Shell assetLinks={assetLinks} title="Benchmarks">
       <Page.Header title="Benchmarks" />
       <Page.Main>
         <Page.Section>
