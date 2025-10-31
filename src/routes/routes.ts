@@ -1,52 +1,26 @@
-import benchmarksRoutes from "@/routes/api/benchmarks";
-import applicationPagesRoutes from "@/routes/app";
-import { SQL, serve } from "bun";
 import { staticFilesRoutes } from "./static/files";
-import BenchmarksServiceInstance from "@/core/services/benchmarks";
-import readCache from "@/utils/readCache";
 import websocketRoutes from "./websockets/websockets";
-import AppRouteScripts from "@/types/AppRouteScripts";
-import AppAssetMap from "@/types/AppAssetMap";
 import log from "@/utils/logger";
-
-type Props = {
-  SQLClientInstance: SQL;
-  scripts: AppRouteScripts;
-  assets: AppAssetMap;
-};
+import BenchmarksRoutes from "./app/categories/[categoryId]/benchmarks/benchmarks.routes";
+import HomeRoutes from "./app/home.routes";
 
 const initialStaticRoutes = await staticFilesRoutes();
 
-export default async function routesServer({
-  SQLClientInstance,
-  scripts,
-  assets,
-}: Props): Promise<Bun.Serve.Options<any>> {
-  const benchmarksServiceInstance = await BenchmarksServiceInstance({
-    sqlClient: SQLClientInstance,
-  });
+export default async function routesServer(): Promise<Bun.Serve.Options<any>> {
+  const benchmarkRoutes = await BenchmarksRoutes();
+  const homeRoutes = await HomeRoutes();
 
-  const cache = await readCache();
-
-  const appRoutes = await applicationPagesRoutes({
-    SQLClientInstance,
-    cache,
-    scripts,
-    assets,
-  });
-
+  console.time("staticRoutes");
   const staticRoutes =
     process.env.NODE_ENV === "development"
       ? await staticFilesRoutes()
       : initialStaticRoutes;
+  console.timeEnd("staticRoutes");
 
-  const routes: Parameters<typeof serve<any>>[0]["routes"] = {
-    ...appRoutes,
-    ...benchmarksRoutes({
-      benchmarksServiceInstance,
-      cache,
-    }),
+  const routes: Bun.Serve.Options<any>["routes"] = {
+    ...benchmarkRoutes,
     ...staticRoutes,
+    ...homeRoutes,
     ...websocketRoutes(),
     "/.well-known/appspecific/com.chrome.devtools.json": new Response(
       JSON.stringify({
