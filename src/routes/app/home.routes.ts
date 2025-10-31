@@ -1,5 +1,4 @@
 import generateClientProps from "@/utils/generateClientProps";
-import log from "@/utils/logger";
 import serverContext from "@/utils/serverContext";
 import { prerender } from "react-dom/static";
 import { snapshot } from "valtio/vanilla";
@@ -13,12 +12,14 @@ export default async function HomeRoutes() {
 
   const homePage = await import("./home.page");
 
-  const filePath = Bun.fileURLToPath(import.meta.url.split(".")[0]);
+  const contextKey = "home";
 
-  const pageBuildContext =
-    buildManifest[filePath.split("app/").pop().split(".")[0]];
+  const pageBuildContext = buildManifest[contextKey];
 
-  log(pageBuildContext);
+  if (!pageBuildContext)
+    throw new Error(
+      "Unable to find page build context with key: " + contextKey,
+    );
 
   const { prelude } = await prerender(
     homePage.default({
