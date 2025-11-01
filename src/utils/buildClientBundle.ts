@@ -1,6 +1,7 @@
 import { readdirSync } from "fs";
 import getHydrationScript from "./getHydrationScript";
 import BuildManifest from "@/types/BundleManifest";
+import log from "./logger";
 
 export default async function buildClientBundle(): Promise<BuildManifest> {
   await Bun.write("./dist/_init", "");
@@ -69,6 +70,18 @@ export default async function buildClientBundle(): Promise<BuildManifest> {
     }, {} as BuildManifest);
 
   Bun.write("./build/manifest.json", JSON.stringify(bundleManifest, null, 2));
+
+  const publicFiles = readdirSync("./src/public", {
+    withFileTypes: true,
+    recursive: true,
+  }).filter((entry) => !entry.isDirectory());
+
+  for (const file of publicFiles) {
+    Bun.write(
+      `./dist/${file.name}`,
+      await Bun.file(`${file.parentPath}/${file.name}`).arrayBuffer(),
+    );
+  }
 
   return bundleManifest;
 }

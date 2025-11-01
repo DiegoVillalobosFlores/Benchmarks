@@ -2,14 +2,12 @@ import contentTypeMap from "@/utils/contentTypeMap";
 import { readdirSync } from "fs";
 
 export const staticFilesRoutes = async () => {
-  console.time("reading dir");
   const staticFiles = readdirSync("./dist", {
     withFileTypes: true,
     recursive: true,
   })
     .filter((entry) => entry.isFile())
     .map((entry) => `${entry.parentPath}/${entry.name}`);
-  console.timeEnd("reading dir");
 
   const enableCompression = process.env.ENABLE_ASSET_COMPRESSION
     ? process.env.ENABLE_ASSET_COMPRESSION === "true"
@@ -18,9 +16,7 @@ export const staticFilesRoutes = async () => {
   const promises = staticFiles.map(
     (staticFile) =>
       new Promise<{ url: string; response: Response }>(async (resolve) => {
-        console.time(`reading file ${staticFile}`);
         const readFile = await Bun.file(staticFile).bytes();
-        console.timeEnd(`reading file ${staticFile}`);
 
         const response = enableCompression
           ? Bun.zstdCompressSync(readFile, {
@@ -46,10 +42,7 @@ export const staticFilesRoutes = async () => {
       }),
   );
 
-  console.time("compressing files");
   const results = await Promise.all(promises);
-
-  console.timeEnd("compressing files");
 
   return results.reduce(
     (acc, result) => {
