@@ -21,7 +21,7 @@ export default function Page({ children, title, assetLinks }: Props) {
           name="description"
           content="Simple site to view, store and share all the benchmarks from different sources"
         />
-        <link rel="icon" type="image/svg+xml" href={"favicon.svg"} />
+        <link rel="icon" type="image/svg+xml" href={"dist/favicon.svg"} />
         {assetLinks.map((link) => (
           <link
             key={link}
