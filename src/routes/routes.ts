@@ -21,7 +21,6 @@ export default async function routesServer(): Promise<Bun.Serve.Options<any>> {
     ...benchmarkRoutes,
     ...staticRoutes,
     ...homeRoutes,
-    ...websocketRoutes(),
     "/.well-known/appspecific/com.chrome.devtools.json": new Response(
       JSON.stringify({
         workspace: {
@@ -50,14 +49,6 @@ export default async function routesServer(): Promise<Bun.Serve.Options<any>> {
     development: process.env.NODE_ENV !== "production" && {
       // Echo console logs from the browser to the server
       console: true,
-    },
-
-    websocket: {
-      message: (ws, message) => {
-        ws.send(message);
-      },
-      open: () => {},
-      close: () => {},
     },
   };
 }

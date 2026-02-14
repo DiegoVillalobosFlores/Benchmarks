@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-const URL = "ws://localhost:3000/websockets/__dev/hmr";
+const HMR_PORT = 3001;
+
+const URL = `ws://localhost:${HMR_PORT}/websockets/__dev/hmr`;
 
 export default function PageHRM() {
   useEffect(() => {
@@ -38,5 +40,5 @@ export default function PageHRM() {
     };
   }, []);
 
-  return <></>;
+  return null;
 }
