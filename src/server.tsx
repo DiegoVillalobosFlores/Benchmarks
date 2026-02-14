@@ -1,8 +1,7 @@
 import { serve } from "bun";
 import SQLiteClient from "./core/clients/sql/sqlite";
 import routesServer from "./routes/routes";
-import { rm } from "node:fs/promises";
-import buildClientBundle from "./utils/buildClientBundle";
+import hmrServer from "./routes/hmr";
 import log from "./utils/logger";
 import { subscribe } from "valtio/vanilla";
 import serverContext, {
@@ -10,6 +9,8 @@ import serverContext, {
   setServerContextRoutes,
 } from "./utils/serverContext";
 import BenchmarksServiceInstance from "./core/services/benchmarks";
+import runMigrations from "./utils/runMigrations";
+import buildServer from "./utils/buildServer";
 
 const serverStartTime = Date.now();
 const fileDir = process.env.SQLITE_DIR;
@@ -24,18 +25,11 @@ const SQLClientInstance = await SQLiteClient({
 
 log("Starting server...");
 if (process.env.NODE_ENV === "development") {
-  log("Building client bundle...");
-
-  await rm("dist", { recursive: true, force: true });
-  await rm("cache", { recursive: true, force: true });
-  await rm("build", { recursive: true, force: true });
-
-  await buildClientBundle();
-  log("✅ Client bundle built");
-
-  log("Running db migrations...");
-  await SQLClientInstance.file("./src/core/sql/migrations/1.sql");
-  log("✅ Migrations completed");
+  await Promise.all([
+    buildServer(),
+    runMigrations(SQLClientInstance, "./src/core/sql/migrations"),
+    hmrServer(),
+  ]);
 }
 
 const buildManifest = await Bun.file("./build/manifest.json").json();
@@ -57,16 +51,6 @@ const server = serve(routes);
 setServerContextRoutes({
   ...routes,
 });
-
-if (process.env.NODE_ENV === "development") {
-  log("Connecting to HMR websocket...");
-  const socket = new WebSocket("ws://localhost:3000/websockets/__dev/hmr");
-
-  socket.addEventListener("open", () => {
-    log("✅ HMR websocket connected");
-    socket.send(JSON.stringify({ type: "reload" }));
-  });
-}
 
 const serverContextSubscriber = subscribe(
   serverContext,

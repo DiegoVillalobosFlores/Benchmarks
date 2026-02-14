@@ -4,10 +4,16 @@ import BuildManifest from "@/types/BundleManifest";
 import log from "./logger";
 
 export default async function buildClientBundle(): Promise<BuildManifest> {
-  await Bun.write("./dist/_init", "");
-  await Bun.write("./cache/_init", "");
-  await Bun.write("./build/_init", "");
+  log("Building client bundle...");
+  log("Writing init files...");
+  await Promise.all([
+    Bun.write("./dist/_init", ""),
+    Bun.write("./cache/_init", ""),
+    Bun.write("./build/_init", ""),
+  ]);
+  log("✅ Init files written");
 
+  log("Building app pages...");
   const appPages = readdirSync("./src/routes/app", {
     withFileTypes: true,
     recursive: true,
@@ -23,7 +29,13 @@ export default async function buildClientBundle(): Promise<BuildManifest> {
     await Bun.write(`./build/${page}`, hydrationScript);
 
     appEntryppoints.push(`./build/${page}`);
-    appPagePaths.push(page.split("app/").pop()?.split(".")[0]);
+    const pagePath = page.split("app/").pop()?.split(".")[0];
+
+    if (!pagePath) {
+      throw new Error(`Invalid page path: ${page}`);
+    }
+
+    appPagePaths.push(pagePath);
   }
 
   const result = await Bun.build({
@@ -82,6 +94,8 @@ export default async function buildClientBundle(): Promise<BuildManifest> {
       await Bun.file(`${file.parentPath}/${file.name}`).arrayBuffer(),
     );
   }
+
+  log("✅ Client built completed");
 
   return bundleManifest;
 }
