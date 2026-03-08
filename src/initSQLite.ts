@@ -1,5 +1,6 @@
 import SQLiteClient from "./core/clients/sql/sqlite";
 import log from "./utils/logger";
+import runMigrations from "./utils/runMigrations";
 
 const fileDir = process.env.SQLITE_DIR;
 
@@ -16,7 +17,7 @@ await Bun.write(`${fileDir}/_init`, "");
 
 const client = await SQLiteClient({ filename: `${fileDir}/benchmarks.db` });
 
-await client.file("./src/core/sql/migrations/1.sql");
+await runMigrations(client, "./src/core/sql/migrations");
 
 log(`SQLite database initialized in ${Date.now() - startTime}ms`);
 

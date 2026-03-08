@@ -49,7 +49,7 @@ export default function UploadPage({ assetMap }: Props) {
   });
 
   return (
-    <Page.Shell assetMap={assetMap} title="Benchmarks - Upload">
+    <Page.Shell assetLinks={assetMap} title="Benchmarks - Upload">
       <Page.Header title="New Benchmark" />
       <Page.Section>
         <FileUpload onUploadSuccess={() => (window.location.href = "/")} />
