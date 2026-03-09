@@ -34,12 +34,14 @@ if (process.env.NODE_ENV === "development") {
 
 const buildManifest = await Bun.file("./build/manifest.json").json();
 
+const benchmarksServiceInstance = await BenchmarksServiceInstance({
+  sqlClient: SQLClientInstance,
+});
+
 initServerContext({
   buildManifest,
   serviceInstances: {
-    benchmarksServiceInstance: await BenchmarksServiceInstance({
-      sqlClient: SQLClientInstance,
-    }),
+    benchmarksServiceInstance,
   },
   sqlClient: SQLClientInstance,
 });

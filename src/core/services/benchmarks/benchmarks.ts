@@ -24,12 +24,13 @@ export default function BenchmarksService({ sqlClient }: { sqlClient: SQL }) {
       const data = await benchmarkFile.text();
 
       const splitData = data.split("\n").map((line) => line.trim());
+      log({ splitData: splitData.slice(0, 1) });
 
-      const valuesWithHeader = splitData.toSpliced(0, 6);
+      const valuesWithHeader = splitData.toSpliced(0, 2);
 
       const header = valuesWithHeader[0].split(",");
 
-      log(header);
+      log({ header });
 
       const dataPoints = valuesWithHeader.toSpliced(0, 1).map((line) => {
         const dataPoint = {};
@@ -43,7 +44,7 @@ export default function BenchmarksService({ sqlClient }: { sqlClient: SQL }) {
         return dataPoint;
       });
 
-      // log(dataPoints);
+      // log({ dataPoints });
 
       const [benchmark] = await sqlClient<Array<{ id: number }>>`
         INSERT INTO "Benchmark" ${sql({ game_id })}
@@ -63,6 +64,8 @@ export default function BenchmarksService({ sqlClient }: { sqlClient: SQL }) {
           await tx`INSERT INTO "BenchmarkMetric" ${sql({ benchmark_id: benchmark.id, ...metric })} RETURNING id`;
         }
       });
+
+      log("inserted");
 
       const metrics = await sqlClient<Array<{ id: number }>>`
         select AVG(frametime), AVG(fps), AVG(gpu_power), AVG(gpu_core_clock) from BenchmarkMetric where benchmark_id = ${benchmark.id};
